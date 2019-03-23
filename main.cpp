@@ -1,53 +1,185 @@
 #include <iostream>
 #include <string.h>
+#include <stdio.h>
 #define MAXMB 300
 #define MAXVE 30
 
 /* run this program using the console pauser or add your own getch, system("pause") or input loop */
 using namespace std;
 
+char arrHK[100];
+int nHK = 0;
 
-// ========== CHUYEN BAY ============
+
+// =========== HANH KHACH ==========
+struct HanhKhach{
+	char cmnd[16];
+	char ho[100];
+	char ten[100];
+	int phai; // 0: Nu, 1 Nam
+};
+
+struct Node_HK{
+	HanhKhach HK;
+	Node_HK *pLeft;
+	Node_HK *pRight;
+};
+//typedef Node_HK *TREE_HK;
+typedef Node_HK *NODPTR;
+NODPTR tree;
+
+void InitTreeHK(NODPTR &tree_hk)
+{
+	tree_hk = NULL;
+}
+bool Empty_HK(NODPTR tree_hk)
+{
+	return tree_hk == NULL;
+}
+bool CheckCMNDIsExisted(NODPTR tree_hk, char cmnd[])
+{
+	if (tree_hk != NULL)
+	{
+		if (strcmp(tree_hk->HK.cmnd, cmnd)== 0)
+			return true;
+		if (strcmp(tree_hk->HK.cmnd, cmnd) > 0)
+			CheckCMNDIsExisted(tree_hk->pLeft, cmnd);
+		else if (strcmp(tree_hk->HK.cmnd, cmnd) < 0)
+			CheckCMNDIsExisted(tree_hk->pRight, cmnd);
+	}
+	return false;
+}
+Node_HK *SearchHK(NODPTR tree_hk, char cmnd[])
+{
+	if (tree_hk != NULL)
+	{
+		Node_HK *pNode = tree_hk;
+		while (pNode != NULL)
+		{
+			if (strcmp(pNode->HK.cmnd, cmnd) == 0)
+				return pNode;
+			else if (strcmp(pNode->HK.cmnd, cmnd) > 0)
+				pNode = pNode->pLeft;
+			else if (strcmp(pNode->HK.cmnd, cmnd) < 0)
+				pNode = pNode->pRight;
+		}
+	}
+	return NULL;
+}
+
+HanhKhach ThemHanhKhach()
+{
+	HanhKhach *hk = new HanhKhach;
+	cout<<"CMND: ";
+	cin>>hk->cmnd; // check cmnd trung
+	cin.ignore();
+	cout<<"Ho: ";
+	gets(hk->ho);
+	cout<<"Ten: ";
+	gets(hk->ten);
+	cout<<"Phai(0:Nu - 1:Nam): ";
+	cin>>hk->phai;
+	return *hk;
+}
+
+void PrintTree(NODPTR tree_hk)
+{
+	if (tree_hk != NULL)
+	{
+		string gt = "";
+		HanhKhach hk = tree_hk->HK;
+	//	if (hk.phai == 0)
+		//{
+		//	gt = "Nu"
+	//	}
+		gt = hk.phai==0?"Nu":"Nam";
+		cout<<hk.cmnd<<"\t"<<hk.ho<<"\t"<<hk.ten<<"\t"<<gt<<endl;
+		PrintTree(tree_hk->pLeft);
+		PrintTree(tree_hk->pRight);
+	}
+}
+
+
+void InsertHKToTree(NODPTR &tree_hk, HanhKhach hk)
+{
+	if (tree_hk == NULL)
+	{
+		Node_HK *pNode = new Node_HK;
+		pNode->HK = hk;
+		pNode->pLeft = pNode->pRight = NULL;
+		tree_hk = pNode;
+		//strcpy(arrHK[++nHK], hk.cmnd);
+	}
+	else
+	{
+		if (strcmp(tree_hk->HK.cmnd, hk.cmnd) > 0)
+			InsertHKToTree(tree_hk->pLeft, hk);
+		else if (strcmp(tree_hk->HK.cmnd, hk.cmnd) < 0)
+			InsertHKToTree(tree_hk->pRight, hk);
+	}
+}
+// =================================
+
+// ========== VE ===================
+
+struct Ve{
+	int soVe;
+	HanhKhach hk;
+};
+struct ListVe{
+	int n;
+	Ve listVe[MAXVE];
+};
+bool Empty(ListVe list)
+{
+	return list.n == 0;
+}
+bool Full(ListVe list)
+{
+	return list.n == MAXVE;
+}
+
+int InsertVe(ListVe &list, int vitri, HanhKhach hk)
+{
+	
+}
+
+// ==================================
+
+
+
+
+
+
+// ========== THOI GIAN ============
 struct ThoiGian{
 	int gio, phut, ngay, thang, nam;
 };
+
+
+// ==========================
+// ========== CHUYEN BAY ============
 struct ChuyenBay{
 	char maCB[15];
 	ThoiGian tgKhoiHanh;
 	char sanBayDen[150];
 	int trangThai;
 	char soHieuMB[15];
-	char dsVe[10];	
+	string *dsVe;	 
 };
 
 struct Node_CB{
 	ChuyenBay cb;
 	Node_CB *pNext;
 };
-struct SingleList_CB
+typedef Node_CB* SingleList_CB;
+SingleList_CB pHead;
+
+void Init_CB(SingleList_CB &listCB)
 {
-	Node_CB *pHead;
-};
-void Initialize(SingleList_CB &listCB)
-{
-	listCB.pHead = NULL;
+	listCB = NULL;
 }
 
-ChuyenBay *NhapChuyenBay()
-{
-	ChuyenBay *cb = new ChuyenBay;
-	cout<<"Ma CB: ";	gets(cb->maCB); fflush(stdin);
-	cout<<"Thoi gian:\tNgay: ";	cin>>cb->tgKhoiHanh.ngay; fflush(stdin); cout<<endl;
-	cout<<"Thang: ";	cin>>cb->tgKhoiHanh.thang; fflush(stdin); cout<<endl;
-	cout<<"Nam: ";	cin>>cb->tgKhoiHanh.nam; fflush(stdin); cout<<endl;
-	cout<<"Gio: ";	cin>>cb->tgKhoiHanh.gio; fflush(stdin); cout<<endl;
-	cout<<"Phut: ";	cin>>cb->tgKhoiHanh.phut; fflush(stdin); cout<<endl;
-	cout<<"So hieu MB: "; gets(cb->soHieuMB); fflush(stdin);
-	cout<<"San bay den: "; gets(cb->sanBayDen); fflush(stdin);
-	cout<<"Danh sach ve: "; gets(cb->dsVe); fflush(stdin);
-	cout<<"Trang thai: "; cin>>cb->trangThai; fflush(stdin);
-	return cb;
-}
 
 Node_CB *CreateNode_CB(ChuyenBay cb_moi)
 {
@@ -62,16 +194,16 @@ Node_CB *CreateNode_CB(ChuyenBay cb_moi)
 	return pNode;
 }
 
-void InsertLast_CB(SingleList_CB &listCB, ChuyenBay *cb_moi)
+void InsertLast_CB(SingleList_CB &listCB, ChuyenBay cb_moi)
 {
 	Node_CB *pNode = CreateNode_CB(cb_moi);
-	if (listCB.pHead == NULL)
+	if (listCB == NULL)
 	{
-		listCB.pHead =pNode;
+		listCB = pNode;
 	}
 	else
 	{
-		Node_CB *pTmp = listCB.pHead;
+		Node_CB *pTmp = listCB;
 		while (pTmp->pNext != NULL)
 			pTmp = pTmp->pNext;
 		pTmp->pNext = pNode;
@@ -81,7 +213,7 @@ void InsertLast_CB(SingleList_CB &listCB, ChuyenBay *cb_moi)
 // TEST: in thu Danh sach CB
 void PrintList_CB(SingleList_CB listCB)
 {
-	Node_CB *pTmp = listCB.pHead;
+	Node_CB *pTmp = listCB;
 	if(pTmp == NULL)
 	{
 		cout<<"Danh sach rong!";
@@ -113,7 +245,7 @@ struct MayBay{
 
 struct ListMayBay{
 	int soluong;
-	MayBay listMB[MAXMB];
+	MayBay *listMB[MAXMB];
 };
 
 int Empty_MB(ListMayBay dsMB)
@@ -125,7 +257,7 @@ int Full_MB(ListMayBay dsMB)
 	return dsMB.soluong == MAXMB;
 }
 
-int KiemTraSoHieu_MB(ListMayBay listMBCheckSoHieu, char *sohieu)
+int CheckSoHieu_MB(ListMayBay listMBCheckSoHieu, char sohieu[])
 {
 	if (Empty_MB(listMBCheckSoHieu))
 		return 0;
@@ -133,20 +265,19 @@ int KiemTraSoHieu_MB(ListMayBay listMBCheckSoHieu, char *sohieu)
 	{
 		for (int i = 0; i < listMBCheckSoHieu.soluong; i++)
 		{
-			if (listMBCheckSoHieu.listMB[i].soHieuMB)
-				return 1;
-			else
-				return 0;
+			if (strcmp(listMBCheckSoHieu.listMB[i]->soHieuMB, sohieu) == 0)
+				return i;
 		}
+		return 0;
 	}
 }
 
-int Insert_MB (ListMayBay &listMB_Add, char *sohieu, int socho)
+int Insert_MB (ListMayBay &listMB_Add, char sohieu[], int socho)
 {
 	if (Empty_MB(listMB_Add))
 	{
-		listMB_Add.listMB[0].soHieuMB = sohieu;
-		listMB_Add.listMB[0].soCho = socho;
+		strcpy(listMB_Add.listMB[0]->soHieuMB, sohieu);
+		listMB_Add.listMB[0]->soCho = socho;
 //		Initialize((listMB_Add.listMB[0].))
 		listMB_Add.soluong = 1;
 		return 1;
@@ -162,43 +293,7 @@ int Insert_MB (ListMayBay &listMB_Add, char *sohieu, int socho)
 
 // =======================
 
-// =========== HANH KHACH ==========
-struct HanhKhach{
-	string cmnd;
-	char ho[100];
-	char ten[100];
-	bool phai;
-};
 
-struct Node_HK{
-	HanhKhach *KH;
-	Node_HK *pLeft;
-	Node_HK *pRight;
-};
-
-
-// =================================
-
-// ========== VE ===================
-
-struct Ve{
-	int soVe;
-	HanhKhach hk;
-};
-struct ListVe{
-	int n;
-	Ve listVe[MAXVE];
-};
-bool Empty(ListVe list)
-{
-	return list.n == 0;
-}
-bool Full(ListVe list)
-{
-	return list.n == MAXVE;
-}
-
-// ==================================
 
 
 
@@ -208,17 +303,28 @@ bool Full(ListVe list)
 
 
 int main(int argc, char** argv) {
-	SingleList_CB list;
-	Initialize(list);
+//	SingleList_CB list;
+//	Initialize(list);
+//	int yes;
+//	do{
+//		ChuyenBay *cb = NhapChuyenBay();
+//		InsertLast_CB(list,cb);
+//		cout<<"\nBan co muon tiep tuc khong?(1/co - 0/khong): ";
+//		cin>>yes;
+//		cin.ignore();
+//	}while(yes==1);
+//	cout<<"\n\t--------Danh sach chuyen bay--------\n";
+//	PrintList_CB(list);
+
+	InitTreeHK(tree);
 	int yes;
 	do{
-		ChuyenBay *cb = NhapChuyenBay();
-		InsertLast_CB(list,cb);
+		HanhKhach hk = ThemHanhKhach();
+		InsertHKToTree(tree, hk);
 		cout<<"\nBan co muon tiep tuc khong?(1/co - 0/khong): ";
 		cin>>yes;
 		cin.ignore();
 	}while(yes==1);
-	cout<<"\n\t--------Danh sach chuyen bay--------\n";
-	PrintList_CB(list);
+	PrintTree(tree);
 	return 0;
 }
