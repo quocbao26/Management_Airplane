@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string.h>
 #include <stdio.h>
+#include <mylib.h>
 #define MAXMB 300
 #define MAXVE 30
 
@@ -424,17 +425,54 @@ int Insert_MB(ListMayBay &listMB_Add, MayBay *mb)
 // =======================
 
 
-
-
-
-
+//int charCounter(char a[])
+//{
+//	int x = 0;
+//	while(a[x] != '\0')
+//		x++;
+//	return x;
+//}
+char *fix_Ma(char ma[])
+{
+	if (strcmp(ma, "") != 0)
+	{
+		// Chuyen chu thuong thanh chu hoa
+		for (int i = 0; i < strlen(ma); i++)
+		{
+			if (ma[i] >= 'a' && ma[i] <= 'z')
+				ma[i] -= 32;
+		}
+	}
+	return ma;
+}
+void XoaKiTu(char s[], int vitrixoa)
+{
+	int n = strlen(s);
+	for (int i = vitrixoa + 1; i < n; i++)
+		s[i-1] = s[i];
+	s[n-1] = '\0';
+}
+char *fix_HoTen(char hoten[])
+{
+	while (strcmp(hoten[0], " ") == 0) 
+		XoaKiTu(hoten, 0);
+	while (strcmp(hoten[strlen(hoten) - 1], ' ') == 0)
+		XoaKiTu(hoten, strlen(hoten) - 1);
+	return hoten;
+}
 
 
 
 int main(int argc, char** argv) {
 	
-	ListMayBay list;
-	list.soluong = 0;
+	char a[100];
+	cout<<"Ho ten: "; 
+	gotoxy(5,10); gets(a);
+	gotoxy(5,5); cout<<a[0];
+//	for (int i = 0; i < charCounter(a); i++)
+//		if (a[i] >= 'a' && a[i] <= 'z')
+//			a[i] -= 32;
+	gotoxy(5,10);cout<<fix_Ma(a);
 	
 //	SingleList_CB list;
 //	Initialize(list);
