@@ -139,10 +139,35 @@ bool Full(ListVe list)
 	return list.n == MAXVE;
 }
 
-int InsertVe(ListVe &list, int vitri, HanhKhach hk)
+bool InsertVe(ListVe &list, int vitri, HanhKhach hk)
 {
-	
+	if (list.listVe[vitri].soVe != -1)
+		return false;
+	else
+	{
+		list.listVe[vitri].soVe = vitri;
+		list.listVe[vitri].hk = hk;
+		list.n += 1;
+		return true;
+	}
 }
+//bool CheckHK(ListVe list)
+//{
+//	//danh sach rong , khong ton tai hanh khach
+//	if (list.n == 0)
+//		return true;
+//	int dem = 0;
+//	for (int i = 0; i < list.n; i++)
+//	{
+//		if (strcmp(list.listVe[i].hk.cmnd, "") == 0)
+//			dem++;
+//	}	
+//	// may bay moi chua co hk nao
+//	if (dem == list.n)
+//		return true;
+//	else
+//	
+//}
 
 // ==================================
 
@@ -172,12 +197,21 @@ struct Node_CB{
 	ChuyenBay cb;
 	Node_CB *pNext;
 };
-typedef Node_CB* SingleList_CB;
-SingleList_CB pHead;
+
+//typedef Node_CB* SingleList_CB;
+//SingleList_CB pHead;
+
+struct SingleList_CB
+{
+	Node_CB *pHead;
+	Node_CB *pTail;
+};
+
 
 void Init_CB(SingleList_CB &listCB)
 {
-	listCB = NULL;
+//	listCB = NULL;
+	listCB.pHead = listCB.pTail = NULL;
 }
 
 
@@ -197,23 +231,82 @@ Node_CB *CreateNode_CB(ChuyenBay cb_moi)
 void InsertLast_CB(SingleList_CB &listCB, ChuyenBay cb_moi)
 {
 	Node_CB *pNode = CreateNode_CB(cb_moi);
-	if (listCB == NULL)
+	if (listCB.pHead == NULL)
 	{
-		listCB = pNode;
+		listCB.pHead = listCB.pTail = pNode;
 	}
 	else
 	{
-		Node_CB *pTmp = listCB;
-		while (pTmp->pNext != NULL)
-			pTmp = pTmp->pNext;
-		pTmp->pNext = pNode;
+		listCB.pTail->pNext = pNode;
+		listCB.pTail = pNode;
 	}
 }
+
+Node_CB * TimKiem_CB(SingleList_CB listCB, char maCB[])
+{
+	for (Node_CB *pNode = listCB.pHead; pNode != NULL; pNode = pNode->pNext)
+	{
+		if (strcmp(pNode->cb.maCB, maCB) == 0)
+			return pNode;
+	}
+	return NULL;
+}
+
+bool Delete_CB_Theo_Ma(SingleList_CB &listCB, char ma[])
+{
+	Node_CB *pDel = listCB.pHead;
+	if (pDel == NULL)
+		return false;
+	else
+	{
+		Node_CB *pPre = NULL;
+		while (pDel != NULL)
+		{
+			if (strcmp(pDel->cb.maCB, ma) == 0)
+				break;
+			pPre = pDel;
+			pDel = pDel->pNext;
+		}
+		if (pDel == NULL)
+		{
+			return false;
+		}
+		else
+		{
+			if (pDel == listCB.pHead)
+			{
+				listCB.pHead = listCB.pHead->pNext;
+				pDel->pNext = NULL;
+				delete pDel;
+				pDel = NULL;
+				return true;
+			}
+			else if (pDel->pNext == NULL)
+			{
+				listCB.pTail = pPre;
+				pPre->pNext = NULL;
+				delete pDel;
+				pDel = NULL;
+				return true;
+			}
+			else
+			{
+				pPre->pNext = pDel->pNext;
+				pDel->pNext = NULL;
+				delete pDel;
+				pDel = NULL;
+				return true;
+			}
+		}
+	}
+	
+}
+
 
 // TEST: in thu Danh sach CB
 void PrintList_CB(SingleList_CB listCB)
 {
-	Node_CB *pTmp = listCB;
+	Node_CB *pTmp = listCB.pHead;
 	if(pTmp == NULL)
 	{
 		cout<<"Danh sach rong!";
@@ -245,7 +338,7 @@ struct MayBay{
 
 struct ListMayBay{
 	int soluong;
-	MayBay *listMB[MAXMB];
+	MayBay *listMB[MAXMB]; 
 };
 
 int Empty_MB(ListMayBay dsMB)
@@ -272,22 +365,59 @@ int CheckSoHieu_MB(ListMayBay listMBCheckSoHieu, char sohieu[])
 	}
 }
 
-int Insert_MB (ListMayBay &listMB_Add, char sohieu[], int socho)
+bool Check_MaMB(ListMayBay l, char mamb[])
 {
-	if (Empty_MB(listMB_Add))
+//	int dem = 0;
+//	while (dem < l.soluong)
+//	{
+//		while (l.listMB[dem]->loaiMB != NULL)
+//		{
+//			if (strcmp(l.listMB[dem]->loaiMB, mamb) == 0)
+//				return true;	
+//			
+//		}	
+//	}	
+//	return false;
+	for (int i = 0; i < l.soluong; i++)
 	{
-		strcpy(listMB_Add.listMB[0]->soHieuMB, sohieu);
-		listMB_Add.listMB[0]->soCho = socho;
-//		Initialize((listMB_Add.listMB[0].))
-		listMB_Add.soluong = 1;
-		return 1;
+		if (strcmp(l.listMB[i]->loaiMB, mamb) == 0)
+			return true;
 	}
-	else if (Full_MB(listMB_Add))
-		return 0;
-	else
-	{
-		
-	}
+	return false;
+}
+
+//int Insert_MB (ListMayBay &listMB_Add, char sohieu[], int socho, char loai[])
+//{
+//	if (Empty_MB(listMB_Add))
+//	{
+//		strcpy(listMB_Add.listMB[0]->soHieuMB, sohieu);
+//		listMB_Add.listMB[0]->soCho = socho;
+//
+//		strcpy(listMB_Add.listMB[0]->loaiMB , loai);
+////		Initialize((listMB_Add.listMB[0].))
+//		listMB_Add.soluong = 1;
+//		return 1;
+//	}
+//	else if (Full_MB(listMB_Add))
+//		return 0;
+//	else
+//	{
+//		
+//	}
+//}
+
+
+int Insert_MB(ListMayBay &listMB_Add, MayBay *mb)
+{
+	int i;
+ 	for (i = listMB_Add.soluong - 1; i >= 0; i--)
+   {
+      	listMB_Add.listMB[i+1] = listMB_Add.listMB[i];
+   }
+   listMB_Add.listMB[i] = mb;
+   listMB_Add.soluong++;
+   return 1;
+   
 }
 
 
@@ -301,8 +431,11 @@ int Insert_MB (ListMayBay &listMB_Add, char sohieu[], int socho)
 
 
 
-
 int main(int argc, char** argv) {
+	
+	ListMayBay list;
+	list.soluong = 0;
+	
 //	SingleList_CB list;
 //	Initialize(list);
 //	int yes;
@@ -316,15 +449,15 @@ int main(int argc, char** argv) {
 //	cout<<"\n\t--------Danh sach chuyen bay--------\n";
 //	PrintList_CB(list);
 
-	InitTreeHK(tree);
-	int yes;
-	do{
-		HanhKhach hk = ThemHanhKhach();
-		InsertHKToTree(tree, hk);
-		cout<<"\nBan co muon tiep tuc khong?(1/co - 0/khong): ";
-		cin>>yes;
-		cin.ignore();
-	}while(yes==1);
-	PrintTree(tree);
+//	InitTreeHK(tree);
+//	int yes;
+//	do{
+//		HanhKhach hk = ThemHanhKhach();
+//		InsertHKToTree(tree, hk);
+//		cout<<"\nBan co muon tiep tuc khong?(1/co - 0/khong): ";
+//		cin>>yes;
+//		cin.ignore();
+//	}while(yes==1);
+//	PrintTree(tree);
 	return 0;
 }
