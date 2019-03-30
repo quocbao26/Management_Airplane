@@ -454,10 +454,43 @@ void XoaKiTu(char s[], int vitrixoa)
 }
 char *fix_HoTen(char hoten[])
 {
-	while (strcmp(hoten[0], " ") == 0) 
-		XoaKiTu(hoten, 0);
-	while (strcmp(hoten[strlen(hoten) - 1], ' ') == 0)
-		XoaKiTu(hoten, strlen(hoten) - 1);
+	// Xoa khoang trang dau va cuoi
+	while (true)
+	{
+		if (hoten[0] == ' ')
+			XoaKiTu(hoten, 0);
+		else if (hoten[strlen(hoten)-1] == ' ')
+			XoaKiTu(hoten, strlen(hoten)-1);
+		else
+			break;
+	}
+	// Xoa khoang tang o giua
+	for (int i = 0; i < strlen(hoten) - 1; i++)
+	{
+		if (hoten[i] == ' ' && hoten[i+1] == ' ')
+		{
+			XoaKiTu(hoten, i);
+			i--;
+		}
+	}
+	// Chuyen Hoa thanh thuong
+	for(int i = 0; i < strlen(hoten); i++)
+		if(hoten[i] >= 'A' && hoten[i] <= 'Z') hoten[i] += 32;
+	
+	hoten[0] = hoten[0] - 32; // In hoa Ki tu dau tien
+	
+	for(int i = 1;i < strlen(hoten); i++) // In hoa chu cai dau tien sau moi khoang trang
+	{
+		if(hoten[i] == ' ')
+		{
+			if(hoten[i+1] >= 'a' && hoten[i+1] <= 'z')
+			{
+				hoten[i+1] -= 32;
+				i = i+1;
+			}
+		}
+	}
+	
 	return hoten;
 }
 
@@ -467,13 +500,10 @@ int main(int argc, char** argv) {
 	
 	char a[100];
 	cout<<"Ho ten: "; 
-	gotoxy(5,10); gets(a);
-	gotoxy(5,5); cout<<a[0];
-//	for (int i = 0; i < charCounter(a); i++)
-//		if (a[i] >= 'a' && a[i] <= 'z')
-//			a[i] -= 32;
-	gotoxy(5,10);cout<<fix_Ma(a);
-	
+	gets(a);
+	cout<<strlen(a)<<endl;
+	cout<<fix_HoTen(a)<<endl;
+	cout<<strlen(fix_HoTen(a))<<endl;
 //	SingleList_CB list;
 //	Initialize(list);
 //	int yes;
