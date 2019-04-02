@@ -265,6 +265,7 @@ bool Insert_MB (ListMayBay &listMB_Add, char sohieu[],  char loai[], int cho)
 	if (empty == 1)
 	{
 		cout<<"\nEmpty\n";
+		listMB_Add.listMB[0] = new MayBay;
  		strcpy(listMB_Add.listMB[0]->soHieuMB, sohieu);
 		listMB_Add.listMB[0]->soCho = cho;
 		strcpy(listMB_Add.listMB[0]->loaiMB , loai);
@@ -280,13 +281,37 @@ bool Insert_MB (ListMayBay &listMB_Add, char sohieu[],  char loai[], int cho)
 	else
 	{
 		cout<<"\nChua day\n";
+		listMB_Add.listMB[listMB_Add.soluong] = new MayBay;
 		strcpy(listMB_Add.listMB[listMB_Add.soluong]->soHieuMB, sohieu);
-		listMB_Add.listMB[n]->soCho = cho;
+		listMB_Add.listMB[listMB_Add.soluong]->soCho = cho;
 		strcpy(listMB_Add.listMB[listMB_Add.soluong]->loaiMB ,loai);
 		listMB_Add.soluong++;
 		return true;
 	}
 }
+void Delete_MB(ListMayBay &listMBDel, char sohieu[])
+{
+	for (int i = 0; i < listMBDel.soluong; i++)
+	{
+		if (strcmp(listMBDel.listMB[i]->soHieuMB, sohieu) == 0)
+		{
+			MayBay* temp = listMBDel.listMB[i];
+			int j = i+1;
+			for( j ; j < listMBDel.soluong; j++){
+				listMBDel.listMB[i] = listMBDel.listMB[j];
+				i = j;
+			}
+			delete temp;
+			listMBDel.listMB[j] = NULL;
+			listMBDel.soluong--;
+			cout<<"Da xoa\n";
+			break;
+		}
+		
+	}
+	
+}
+
 void Xuat_MB(ListMayBay listmb)
 {
 	for (int i = 0; i < listmb.soluong; i++)
@@ -740,7 +765,10 @@ int main(int argc, char** argv) {
 		cin.ignore();
 	}while(y==1);
 	Xuat_MB(lst);
-	
+	char mbdel[50];
+	cout<<"So hieu mb xoa: "; gets(mbdel);
+	Delete_MB(lst, mbdel);
+	Xuat_MB(lst);
 
 
 	
