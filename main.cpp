@@ -5,6 +5,31 @@
 #define MAXMB 300
 #define MAXVE 30
 
+#define MAX 100
+#define UP 72
+#define DOWN 80
+#define BACKSPACE 8
+#define ENTER 13
+#define ESC 27
+#define RIGHT 77
+#define LEFT 75
+
+#define F1 59
+#define F2 60
+#define F3 61
+
+#define ArrowRIGHT 27
+#define ArrowLEFT 26
+#define ArrowUP 25
+#define ArrowDOWN 24
+
+#define boxx 18 //Vi tri x bat dau cua box
+#define boxy 15 //Vi tri y bat dau cua box
+#define boxs 60 //Box size
+#define tabx 6 // vi tri x bat dau cua table
+#define taby 4  // vi tri y bat dau cua table
+#define tabs 83 // table box
+#define tabw 23 // table hight
 /* run this program using the console pauser or add your own getch, system("pause") or input loop */
 using namespace std;
 
@@ -109,7 +134,6 @@ void InsertHKToTree(NODPTR &tree_hk, HanhKhach hk)
 		pNode->HK = hk;
 		pNode->pLeft = pNode->pRight = NULL;
 		tree_hk = pNode;
-		//strcpy(arrHK[++nHK], hk.cmnd);
 	}
 	else
 	{
@@ -119,6 +143,8 @@ void InsertHKToTree(NODPTR &tree_hk, HanhKhach hk)
 			InsertHKToTree(tree_hk->pRight, hk);
 	}
 }
+
+
 // =================================
 
 // ========== VE ===================
@@ -184,6 +210,99 @@ struct ThoiGian{
 
 
 // ==========================
+
+
+// ========= MAY BAY==========
+struct MayBay{
+	char soHieuMB[15];
+	char loaiMB[40];
+	int soCho;
+};
+
+struct ListMayBay{
+	int soluong;
+	MayBay *listMB[MAXMB]; 
+};
+
+int Empty_MB(ListMayBay dsMB)
+{
+	return dsMB.soluong == 0;
+}
+int Full_MB(ListMayBay dsMB)
+{
+	return dsMB.soluong == 3;
+}
+
+int CheckSoHieu_MB(ListMayBay listMBCheckSoHieu, char sohieu[])
+{
+	if (Empty_MB(listMBCheckSoHieu))
+		return 0;
+	else
+	{
+		for (int i = 0; i < listMBCheckSoHieu.soluong; i++)
+		{
+			if (strcmp(listMBCheckSoHieu.listMB[i]->soHieuMB, sohieu) == 0)
+				return i;
+		}
+		return 0;
+	}
+}
+
+bool Check_MaMB(ListMayBay l, char mamb[])
+{
+	for (int i = 0; i < l.soluong; i++)
+	{
+		if (strcmp(l.listMB[i]->loaiMB, mamb) == 0)
+			return true;
+	}
+	return false;
+}
+
+bool Insert_MB (ListMayBay &listMB_Add, char sohieu[],  char loai[], int cho)
+{
+	int empty = Empty_MB(listMB_Add);
+	int full = Full_MB(listMB_Add);
+	if (empty == 1)
+	{
+		cout<<"\nEmpty\n";
+ 		strcpy(listMB_Add.listMB[0]->soHieuMB, sohieu);
+		listMB_Add.listMB[0]->soCho = cho;
+		strcpy(listMB_Add.listMB[0]->loaiMB , loai);
+		listMB_Add.soluong = 1;
+		return true;
+	}
+	else if (full)
+	{
+		cout<<"\nFull\n";
+		return false;
+	}
+		
+	else
+	{
+		cout<<"\nChua day\n";
+		strcpy(listMB_Add.listMB[listMB_Add.soluong]->soHieuMB, sohieu);
+		listMB_Add.listMB[n]->soCho = cho;
+		strcpy(listMB_Add.listMB[listMB_Add.soluong]->loaiMB ,loai);
+		listMB_Add.soluong++;
+		return true;
+	}
+}
+void Xuat_MB(ListMayBay listmb)
+{
+	for (int i = 0; i < listmb.soluong; i++)
+	{
+		cout<<listmb.listMB[i]->soHieuMB<<"\t"<<listmb.listMB[i]->loaiMB<<"\t"<<listmb.listMB[i]->soCho<<endl;
+	}
+}
+
+
+
+
+
+// =======================
+
+
+
 // ========== CHUYEN BAY ============
 struct ChuyenBay{
 	char maCB[15];
@@ -199,8 +318,6 @@ struct Node_CB{
 	Node_CB *pNext;
 };
 
-//typedef Node_CB* SingleList_CB;
-//SingleList_CB pHead;
 
 struct SingleList_CB
 {
@@ -211,7 +328,6 @@ struct SingleList_CB
 
 void Init_CB(SingleList_CB &listCB)
 {
-//	listCB = NULL;
 	listCB.pHead = listCB.pTail = NULL;
 }
 
@@ -330,108 +446,9 @@ void PrintList_CB(SingleList_CB listCB)
 
 
 
-// ========= MAY BAY==========
-struct MayBay{
-	char soHieuMB[15];
-	char loaiMB[40];
-	int soCho;
-};
-
-struct ListMayBay{
-	int soluong;
-	MayBay *listMB[MAXMB]; 
-};
-
-int Empty_MB(ListMayBay dsMB)
-{
-	return dsMB.soluong == 0;
-}
-int Full_MB(ListMayBay dsMB)
-{
-	return dsMB.soluong == MAXMB;
-}
-
-int CheckSoHieu_MB(ListMayBay listMBCheckSoHieu, char sohieu[])
-{
-	if (Empty_MB(listMBCheckSoHieu))
-		return 0;
-	else
-	{
-		for (int i = 0; i < listMBCheckSoHieu.soluong; i++)
-		{
-			if (strcmp(listMBCheckSoHieu.listMB[i]->soHieuMB, sohieu) == 0)
-				return i;
-		}
-		return 0;
-	}
-}
-
-bool Check_MaMB(ListMayBay l, char mamb[])
-{
-//	int dem = 0;
-//	while (dem < l.soluong)
-//	{
-//		while (l.listMB[dem]->loaiMB != NULL)
-//		{
-//			if (strcmp(l.listMB[dem]->loaiMB, mamb) == 0)
-//				return true;	
-//			
-//		}	
-//	}	
-//	return false;
-	for (int i = 0; i < l.soluong; i++)
-	{
-		if (strcmp(l.listMB[i]->loaiMB, mamb) == 0)
-			return true;
-	}
-	return false;
-}
-
-//int Insert_MB (ListMayBay &listMB_Add, char sohieu[], int socho, char loai[])
-//{
-//	if (Empty_MB(listMB_Add))
-//	{
-//		strcpy(listMB_Add.listMB[0]->soHieuMB, sohieu);
-//		listMB_Add.listMB[0]->soCho = socho;
-//
-//		strcpy(listMB_Add.listMB[0]->loaiMB , loai);
-////		Initialize((listMB_Add.listMB[0].))
-//		listMB_Add.soluong = 1;
-//		return 1;
-//	}
-//	else if (Full_MB(listMB_Add))
-//		return 0;
-//	else
-//	{
-//		
-//	}
-//}
 
 
-int Insert_MB(ListMayBay &listMB_Add, MayBay *mb)
-{
-	int i;
- 	for (i = listMB_Add.soluong - 1; i >= 0; i--)
-   {
-      	listMB_Add.listMB[i+1] = listMB_Add.listMB[i];
-   }
-   listMB_Add.listMB[i] = mb;
-   listMB_Add.soluong++;
-   return 1;
-   
-}
 
-
-// =======================
-
-
-//int charCounter(char a[])
-//{
-//	int x = 0;
-//	while(a[x] != '\0')
-//		x++;
-//	return x;
-//}
 char *fix_Ma(char ma[])
 {
 	if (strcmp(ma, "") != 0)
@@ -494,38 +511,238 @@ char *fix_HoTen(char hoten[])
 	return hoten;
 }
 
+void Box_NhapMayBay()
+{
+	SetColor(15);
+	gotoxy(boxx, boxy); cout << char(201);
+	for(int i = 1; i < boxs + 1; i++) cout << char(205);
+	cout << char(187);
+	gotoxy(boxx, boxy + 1); cout << char(186);
+	gotoxy(boxx + boxs + 1, boxy + 1); cout << char(186);
+	gotoxy(boxx, boxy + 2); cout << char(186)<< " Nhap vao so hieu may bay: ";
+	gotoxy(boxx + boxs + 1, boxy + 2); cout << char(186);
+	gotoxy(boxx, boxy + 3); cout << char(186) ;
+	gotoxy(boxx + boxs + 1, boxy + 3); cout << char(186);
+	gotoxy(boxx, boxy + 4); cout << char(186)<< "    Nhap vao loai may bay: ";
+	gotoxy(boxx + boxs + 1, boxy + 4); cout << char(186);
+	gotoxy(boxx, boxy + 5); cout << char(186);
+	gotoxy(boxx + boxs + 1, boxy + 5); cout << char(186);
+	gotoxy(boxx, boxy + 6); cout << char(186)<< "          Nhap vao so cho: ";
+	gotoxy(boxx + boxs + 1, boxy + 6); cout << char(186);
+	gotoxy(boxx, boxy + 7); cout << char(186);
+	gotoxy(boxx + boxs + 1, boxy + 7); cout << char(186);
+	gotoxy(boxx, boxy + 8); cout << char(200);
+	for(int i = 1; i < boxs + 1; i++) cout << char(205);
+	cout << char(188); 
+}
+
+void Menu()
+{
+
+	
+	int x = 15, y = 16;
+	int keyhit;
+	char menu_text[10][100] = {" 1. THEM MAY BAY ", 
+								" 2. THEM CHUYEN BAY ", 
+								" 3. DAT VE ", 
+								" 4. DANH SACH MAY BAY ", 
+								" 5. DANH SACH CHUYEN BAY ",
+								" 6. IN DANH SACH HANH KHACH THUOC CHUYEN BAY THEO MA ", 
+								" 7. IN DANH SACH CHUYEN DAY KHOI NGAY TRONG NGAY DEN NOI ? CON VE" , 
+								" 8. IN DANH SACH CAC VE CON TRONG THEO MA CHUYEN MA " , 
+								" 9. THONG KE SO LAN BAY CUA CAC CHUYEN BAY " , 
+								" 10. KET THUC CHUONG TRINH "};
+	Menu:
+
+	int c = 0;
+	int i = 1;
+	SetColor(15);
+	gotoxy(25, 35);
+	cout << "SINH VIEN : ";
+	gotoxy(46, 35);
+	cout << "- Ngo Hoang Quoc Bao";
+	gotoxy(46, 36);
+	cout << "- Phan Huy Phuong";
+	
+	gotoxy(15, 16); cout << menu_text[0];
+	gotoxy(15, 17); cout << menu_text[1];
+	gotoxy(15, 18); cout << menu_text[2];
+	gotoxy(15, 19); cout << menu_text[3];
+	gotoxy(15, 20); cout << menu_text[4];
+	gotoxy(15, 21); cout << menu_text[5];
+	gotoxy(15, 22); cout << menu_text[6];
+	gotoxy(15, 23); cout << menu_text[7];
+	gotoxy(15, 24); cout << menu_text[8];
+	gotoxy(15, 25); cout << menu_text[9];
+	do{
+		gotoxy(x, y);
+		SetColor(159);
+		switch(y)
+		{
+			case 16 : gotoxy(15, 16); cout << menu_text[0]; break;
+			case 17 : gotoxy(15, 17); cout << menu_text[1]; break;
+			case 18 : gotoxy(15, 18); cout << menu_text[2]; break;
+			case 19 : gotoxy(15, 19); cout << menu_text[3]; break;
+			case 20 : gotoxy(15, 20); cout << menu_text[4]; break;
+			case 21 : gotoxy(15, 21); cout << menu_text[5]; break;
+			case 22 : gotoxy(15, 22); cout << menu_text[6]; break;
+			case 23 : gotoxy(15, 23); cout << menu_text[7]; break;
+			case 24 : gotoxy(15, 24); cout << menu_text[8]; break;
+			case 25 : gotoxy(15, 25); cout << menu_text[9]; break;
+			
+		}
+		keyhit = getch();
+		if(keyhit == UP)
+		{
+			gotoxy(x, y);
+			SetColor(15);
+			switch(y)
+			{
+				case 16 : gotoxy(15, 16); cout << menu_text[0]; break;
+				case 17 : gotoxy(15, 17); cout << menu_text[1]; break;
+				case 18 : gotoxy(15, 18); cout << menu_text[2]; break;
+				case 19 : gotoxy(15, 19); cout << menu_text[3]; break;
+				case 20 : gotoxy(15, 20); cout << menu_text[4]; break;
+				case 21 : gotoxy(15, 21); cout << menu_text[5]; break;
+				case 22 : gotoxy(15, 22); cout << menu_text[6]; break;
+				case 23 : gotoxy(15, 23); cout << menu_text[7]; break;
+				case 24 : gotoxy(15, 24); cout << menu_text[8]; break;
+				case 25 : gotoxy(15, 25); cout << menu_text[9]; break;
+				
+			}
+			y--;
+			if(y < 16)
+			{
+				y = 25;
+			}
+		}
+		else if(keyhit == DOWN)
+		{
+			gotoxy(x, y);
+			SetColor(15);
+			switch(y)
+			{
+				case 16 : gotoxy(15, 16); cout << menu_text[0]; break;
+				case 17 : gotoxy(15, 17); cout << menu_text[1]; break;
+				case 18 : gotoxy(15, 18); cout << menu_text[2]; break;
+				case 19 : gotoxy(15, 19); cout << menu_text[3]; break;
+				case 20 : gotoxy(15, 20); cout << menu_text[4]; break;
+				case 21 : gotoxy(15, 21); cout << menu_text[5]; break;
+				case 22 : gotoxy(15, 22); cout << menu_text[6]; break;
+				case 23 : gotoxy(15, 23); cout << menu_text[7]; break;
+				case 24 : gotoxy(15, 24); cout << menu_text[8]; break;
+				case 25 : gotoxy(15, 25); cout << menu_text[9]; break;
+			
+			}
+			y++;
+			if(y > 25)
+			{
+				y = 16;
+			}
+		}
+		
+		if(y == 16 && keyhit == ENTER)
+		{
+			SetColor(15);
+			system("cls");
+
+			goto Menu;
+		}
+		else if(y == 17 && keyhit == ENTER)
+		{
+			SetColor(15);
+			system("cls");
+
+			goto Menu;
+		}
+		else if(y == 18 && keyhit == ENTER)
+		{
+			SetColor(15);
+			system("cls");
+
+			goto Menu;
+		}
+		else if(y == 19 && keyhit == ENTER)
+		{
+			SetColor(15);
+			system("cls");
+
+			goto Menu;
+		}
+		else if(y == 20 && keyhit == ENTER)
+		{
+			SetColor(15);
+			system("cls");
+
+			goto Menu;
+		}
+		else if(y == 21 && keyhit == ENTER)
+		{
+			SetColor(15);
+			system("cls");
+
+			goto Menu;
+		}
+		else if(y == 22 && keyhit == ENTER)
+		{
+			SetColor(15);
+			system("cls");
+
+			goto Menu;
+		}
+		else if(y == 23 && keyhit == ENTER)
+		{
+			SetColor(15);
+			system("cls");
+
+			goto Menu;
+		}
+		else if(y == 24 && keyhit == ENTER)
+		{
+			SetColor(15);
+			system("cls");
+
+			goto Menu;
+		}
+		else if(y == 25 && keyhit == ENTER)
+		{
+			exit(0);
+			SetColor(15);
+		}
+		
+	}while(true);
+}
+
+
 
 
 int main(int argc, char** argv) {
-	
-	char a[100];
-	cout<<"Ho ten: "; 
-	gets(a);
-	cout<<strlen(a)<<endl;
-	cout<<fix_HoTen(a)<<endl;
-	cout<<strlen(fix_HoTen(a))<<endl;
-//	SingleList_CB list;
-//	Initialize(list);
-//	int yes;
-//	do{
-//		ChuyenBay *cb = NhapChuyenBay();
-//		InsertLast_CB(list,cb);
-//		cout<<"\nBan co muon tiep tuc khong?(1/co - 0/khong): ";
-//		cin>>yes;
-//		cin.ignore();
-//	}while(yes==1);
-//	cout<<"\n\t--------Danh sach chuyen bay--------\n";
-//	PrintList_CB(list);
 
-//	InitTreeHK(tree);
-//	int yes;
-//	do{
-//		HanhKhach hk = ThemHanhKhach();
-//		InsertHKToTree(tree, hk);
-//		cout<<"\nBan co muon tiep tuc khong?(1/co - 0/khong): ";
-//		cin>>yes;
-//		cin.ignore();
-//	}while(yes==1);
-//	PrintTree(tree);
+	ListMayBay lst;
+	lst.soluong = 0;
+	char sohieu[15], loai[15];
+	int cho;
+	int y;
+	do
+	{
+		cout<<"So hieu may bay: ";
+		gets(sohieu);
+		
+		cout<<"\nLoai may bay: ";
+		gets(loai);
+		
+		cout<<"\nSo cho: ";
+		cin>>cho;
+		
+		Insert_MB(lst, sohieu, loai, cho);
+		cout<<"Tiep tuc(1: co - 0: khong): ";
+		cin>>y;
+		cin.ignore();
+	}while(y==1);
+	Xuat_MB(lst);
+	
+
+
+	
 	return 0;
 }
