@@ -1,8 +1,8 @@
-1,ngo w,1
-10,ngo z,1
-2,ngo o,1
-3,ngo p,1
-4,ngo g,1
-7,ngo y,1
-8,ngo a,1
-9,ngo s,1
+1,ngo w,nam
+10,ngo z,nam
+2,ngo o,nu
+3,ngo p,nam
+4,ngo g,nu
+7,ngo y,nu
+8,ngo a,nu
+9,ngo s,nam
