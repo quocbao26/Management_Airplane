@@ -63,6 +63,56 @@ using namespace std;
 //	MoveWindow(console, r.left, r.top, width, height, TRUE);
 //}
 
+// ======= VE ===========
+struct Ve{
+	int soGhe;
+	char cmnd[16];
+};
+struct ListVe{
+	int n;
+	Ve *ve;
+};
+
+struct ThoiGian{
+	int gio, phut, ngay, thang, nam;
+};
+
+// ==========================
+
+// ========== CHUYEN BAY ============
+struct ChuyenBay{
+	char maCB[15];
+	ThoiGian tgKhoiHanh;
+	char sanBayDen[150];
+	int trangThai;
+	char soHieuMB[15];
+	ListVe dsVe;	 
+};
+struct Node_CB{
+	ChuyenBay cb;
+	Node_CB *pNext;
+};
+struct SingleList_CB
+{
+	Node_CB *pHead;
+	Node_CB *pTail;
+};
+
+
+
+// ========= MAY BAY==========
+struct MayBay{
+	char soHieuMB[15];
+	char loaiMB[40];
+	int soCho;
+};
+
+struct ListMayBay{
+	int soluong;
+	MayBay *maybay[MAXMB]; 
+};
+
+
 // =========== HANH KHACH ==========
 struct HanhKhach{
 	char cmnd[16];
@@ -474,17 +524,17 @@ void DocFileHanhKhach(NODPTR &tree_hk)
 		getline(filein, cmnd, ',');
 		if(cmnd != ""){
 			strcpy(hk.cmnd, cmnd.c_str());
-			cout<<"\nCMND:"<<hk.cmnd;
+			
 			getline(filein, hoten, ',');
 			char ho[100], ten[100], hotenc[200];
 			strcpy(hotenc, hoten.c_str());
-			cout<<"\nHo ten:"<<hotenc;
+			
 			strcpy(hk.ho, tach_ho_dem(hotenc));
-			cout<<"\nHo:"<<hk.ho;
+		
 			strcpy(hk.ten, tach_Ten(hotenc));
-			cout<<"\nTen:"<<hk.ten;
+		
 			filein>>hk.phai;
-			cout<<"\nPhai:"<<hk.phai;
+		
 			getline(filein, tmp);
 			InsertHKToTree(tree_hk, hk);
 		}
@@ -498,37 +548,35 @@ void DocFileHanhKhach(NODPTR &tree_hk)
 
 // ========== VE ===================
 
-struct Ve{
-	int soGhe;
-	char cmnd[16];
-};
-
-
-struct ListVe{
-	int n;
-	Ve *ve;
-};
 
 
 void initListVe(ListVe &dsVe, int soCho){
 	dsVe.n = 0;
 	dsVe.ve = new Ve[soCho];
-	for(int i = 0; i < soCho; i++ ){
+	for(int i = 0; i < soCho; i++ )
+	{
 		dsVe.ve[i].soGhe = i+1;
 		strcpy(dsVe.ve[i].cmnd, "");
 	}
 }
 
-bool InsertVe(ListVe &list, int vitri, char cmnd[])
+bool InsertVe(ListVe &list, int soGhe, char cmnd[])
 {
-	if (strlen(list.ve[vitri-1].cmnd) > 0)
+	
+	if (strlen(list.ve[soGhe-1].cmnd) > 0)
 		return false;
 	else
 	{
-		strcpy(list.ve[vitri-1].cmnd, cmnd);
-		list.n += 1;
+		
+		strcpy(list.ve[soGhe-1].cmnd, cmnd);
+		list.ve[soGhe-1].soGhe = soGhe;
+		list.n++;
 		return true;
 	}
+//	list.ve[list.n].soGhe = soGhe;
+//	strcpy(list.ve[list.n].cmnd, cmnd);
+//	list.n++;
+	
 }
 //bool CheckHK(ListVe list)
 //{
@@ -553,48 +601,7 @@ bool InsertVe(ListVe &list, int vitri, char cmnd[])
 
 
 // ========== THOI GIAN ============
-struct ThoiGian{
-	int gio, phut, ngay, thang, nam;
-};
 
-// ==========================
-
-// ========== CHUYEN BAY ============
-struct ChuyenBay{
-	char maCB[15];
-	ThoiGian tgKhoiHanh;
-	char sanBayDen[150];
-	int trangThai;
-	char soHieuMB[15];
-	ListVe dsVe;	 
-};
-
-struct Node_CB{
-	ChuyenBay cb;
-	Node_CB *pNext;
-};
-
-struct SingleList_CB
-{
-	Node_CB *pHead;
-	Node_CB *pTail;
-};
-
-
-
-
-
-// ========= MAY BAY==========
-struct MayBay{
-	char soHieuMB[15];
-	char loaiMB[40];
-	int soCho;
-};
-
-struct ListMayBay{
-	int soluong;
-	MayBay *listMB[MAXMB]; 
-};
 
 int Empty_MB(ListMayBay dsMB)
 {
@@ -610,82 +617,13 @@ void Init_CB(SingleList_CB &listCB)
 	listCB.pHead = listCB.pTail = NULL;
 }
 
-//void docfile(ListMayBay &lmb)
-//{
-//	ifstream filein;
-//	filein.open("data.txt", ios::in);
-//	int soluongcb = 0, soluongvedadat = 0, vitrighe = 0;
-//	ChuyenBay cb;
-//	filein >> lmb.soluong;
-//	for (int i = 0; i < lmb.soluong; i++)
-//	{
-//		filein >> lmb.listMB[i]->soHieuMB;
-//		filein >> lmb.listMB[i]->soCho;
-//		filein >> soluongcb;
-//		Init_CB(lmb.listMB[i]->listCBOf);
-//		for (int j = 0; j < soluongcb; j++)
-//		{
-//			getline(filein, cb.maCB, ',');
-//		}
-//	}
-//}
-//
-//void ghifile(ListMayBay lmb)
-//{
-//	Node_CB *pNodeCB;
-//	int soluongcb = 0, soluongvedadat = 0;
-//	ofstream fileout;
-//	fileout.open("data.txt", ios::trunc);
-//	fileout << lmb.soluong << endl;
-//	for (int i = 0; i < lmb.soluong; i++)
-//	{
-//		fileout << lmb.listMB[i]->soHieuMB << endl;
-//		fileout << lmb.listMB[i]->soCho << endl;
-//		pNodeCB = lmb.listMB[i]->listCBOf;
-//		while (lmb.listMB[i]->listCBOf != NULL)
-//		{
-//			lmb.listMB[i]->listCBOf = lmb.listMB[i]->listCBOf->pNext;
-//			soluongcb++;
-//		}
-//		fileout << soluongcb << endl;
-//		while (pNodeCB != NULL)
-//		{
-//			fileout << pNodeCB->cb.maCB << "," 
-//					<< pNodeCB->cb.tgKhoiHanh.ngay << "/" 
-//					<< pNodeCB->cb.tgKhoiHanh.thang << "/" 
-//					<< pNodeCB->cb.tgKhoiHanh.nam << ","
-//					<< pNodeCB->cb.tgKhoiHanh.gio << ":"
-//					<< pNodeCB->cb.tgKhoiHanh.phut << endl;
-//			fileout << pNodeCB->cb.sanBayDen <<endl;
-//			fileout << pNodeCB->cb.trangThai <<endl;
-//			for (int j = 0; j < lmb.listMB[i]->soCho; j++)
-//			{
-//				if (pNodeCB->cb.dsVe[j] != ""){
-//					soluongvedadat++;
-//				}
-//			}
-//			soluongvedadat = 0;
-//			for (int ghe = 0; ghe < lmb.listMB[i]->soCho; ghe++)
-//			{
-//				if (pNodeCB->cb.dsVe[ghe] != "")
-//				{
-//					fileout << ghe << end;
-//					fileout << pNodeCB->cb.dsVe[ghe] << endl;
-//				}
-//			}
-//			pNodeCB = pNodeCB->pNext;
-//		}
-//		soluongcb = 0;
-//	}
-//	fileout.close();
-//}
 
 int getsocho(ListMayBay lmb, char soHieu[])
 {
 	for (int i = 0; i < lmb.soluong; i++)
 	{
-		if (strcmp(lmb.listMB[i]->soHieuMB, soHieu) == 0)
-			return lmb.listMB[i]->soCho;
+		if (strcmp(lmb.maybay[i]->soHieuMB, soHieu) == 0)
+			return lmb.maybay[i]->soCho;
 	}
 	return -1;
 }
@@ -710,8 +648,16 @@ void LuuFileChuyenBay(SingleList_CB listCB, ListMayBay lmb)
 		fileout << cb.sanBayDen <<endl;
 		fileout << cb.trangThai <<endl;
 		
+		int demsovedaban = 0;
 		int socho = getsocho(lmb, cb.soHieuMB);
-	
+		for (int vitrighe = 0; vitrighe < socho; vitrighe++)
+		{
+			if (strlen(cb.dsVe.ve[vitrighe].cmnd) > 0)
+			{
+				demsovedaban++;
+			}
+		}
+		fileout << demsovedaban << endl;
 		for (int vitrighe = 0; vitrighe < socho; vitrighe++)
 		{
 			if (strlen(cb.dsVe.ve[vitrighe].cmnd) > 0)
@@ -728,22 +674,22 @@ void LuuFileMayBay(ListMayBay listMB, ofstream &fileout)
 	fileout << listMB.soluong<<endl;
 	for (int i = 0; i < listMB.soluong; i++)
 	{
-		fileout << listMB.listMB[i]->soHieuMB << ","<<listMB.listMB[i]->loaiMB << ","<<listMB.listMB[i]->soCho<<endl;
+		fileout << listMB.maybay[i]->soHieuMB << ","<<listMB.maybay[i]->loaiMB << ","<<listMB.maybay[i]->soCho<<endl;
 	}
 	
 	fileout.close();
 }
-int Insert_MB(ListMayBay &listMB_Add, MayBay mb)
+int Insert_MB(ListMayBay &listMB, MayBay mb)
 {
-	int empty = Empty_MB(listMB_Add);
-	int full = Full_MB(listMB_Add);
+	int empty = Empty_MB(listMB);
+	int full = Full_MB(listMB);
 	if (empty == 1)
 	{
-		listMB_Add.listMB[0] = new MayBay;
- 		strcpy(listMB_Add.listMB[0]->soHieuMB, mb.soHieuMB);
-		listMB_Add.listMB[0]->soCho = mb.soCho;
-		strcpy(listMB_Add.listMB[0]->loaiMB , mb.loaiMB);
-		listMB_Add.soluong = 1;
+		listMB.maybay[0] = new MayBay;
+ 		strcpy(listMB.maybay[0]->soHieuMB, mb.soHieuMB);
+		listMB.maybay[0]->soCho = mb.soCho;
+		strcpy(listMB.maybay[0]->loaiMB , mb.loaiMB);
+		listMB.soluong = 1;
 		return 1;
 	}
 	else if (full)
@@ -753,16 +699,18 @@ int Insert_MB(ListMayBay &listMB_Add, MayBay mb)
 		
 	else
 	{
-		listMB_Add.listMB[listMB_Add.soluong] = new MayBay;
-		strcpy(listMB_Add.listMB[listMB_Add.soluong]->soHieuMB, mb.soHieuMB);
-		listMB_Add.listMB[listMB_Add.soluong]->soCho = mb.soCho;
-		strcpy(listMB_Add.listMB[listMB_Add.soluong]->loaiMB , mb.loaiMB);
-		listMB_Add.soluong++;
+		listMB.maybay[listMB.soluong] = new MayBay;
+		strcpy(listMB.maybay[listMB.soluong]->soHieuMB, mb.soHieuMB);
+		listMB.maybay[listMB.soluong]->soCho = mb.soCho;
+		strcpy(listMB.maybay[listMB.soluong]->loaiMB , mb.loaiMB);
+		listMB.soluong++;
 		return 1;
 	}
 }
-void DocFileMayBay(ListMayBay &listmb, ifstream &filein)
+void DocFileMayBay(ListMayBay &listmb)
 {
+	ifstream filein;
+	filein.open("maybay.txt", ios::in);
 	int n; // get so luong may bay
 	listmb.soluong = 0;
 	string tmp;
@@ -789,54 +737,74 @@ void DocFileMayBay(ListMayBay &listmb, ifstream &filein)
 }
 
 bool Check_ThoiGian_ChuyenBay(ThoiGian tg);
-void DocFileChuyenBay(SingleList_CB &lcb)
+void InsertLast_CB(SingleList_CB &lcb, ChuyenBay cb);
+void DocFileChuyenBay(SingleList_CB &lcb, ListMayBay lmb)
 {
 	ifstream filein;
 	filein.open("chuyenbay.txt", ios::in);
 	string tmp; 
-	int so;
-	ChuyenBay cb;
-	
-	getline(filein, tmp);
-	strcpy(cb.soHieuMB, tmp.c_str());
-	
-	getline(filein, tmp, ',');
-	strcpy(cb.maCB, tmp.c_str());
-	
-	getline(filein, tmp, '/');
-	cb.tgKhoiHanh.ngay = atoi(tmp.c_str());
-	
-	getline(filein, tmp, '/');
-	cb.tgKhoiHanh.thang = atoi(tmp.c_str());
-	
-	getline(filein, tmp, ',');
-	cb.tgKhoiHanh.nam = atoi(tmp.c_str());
-	
-	getline(filein, tmp, ':');
-	cb.tgKhoiHanh.gio = atoi(tmp.c_str());
-	
-	getline(filein, tmp);
-	cb.tgKhoiHanh.phut = atoi(tmp.c_str());
-	
-	
-	getline(filein, tmp);
-	strcpy(cb.sanBayDen, tmp.c_str());
-	
-	getline(filein, tmp);
-	cb.trangThai = atoi(tmp.c_str());
-	if (Check_ThoiGian_ChuyenBay(cb.tgKhoiHanh) == false)
-		cb.trangThai = 3;
+	do
+	{
+		ChuyenBay cb;
+		
+		getline(filein, tmp);
+		if (tmp != "")
+		{
+			strcpy(cb.soHieuMB, tmp.c_str());
+			
+			getline(filein, tmp, ',');
+			strcpy(cb.maCB, tmp.c_str());
+			
+			getline(filein, tmp, '/');
+			cb.tgKhoiHanh.ngay = atoi(tmp.c_str());
+			
+			getline(filein, tmp, '/');
+			cb.tgKhoiHanh.thang = atoi(tmp.c_str());
+			
+			getline(filein, tmp, ',');
+			cb.tgKhoiHanh.nam = atoi(tmp.c_str());
+			
+			getline(filein, tmp, ':');
+			cb.tgKhoiHanh.gio = atoi(tmp.c_str());
+			
+			getline(filein, tmp);
+			cb.tgKhoiHanh.phut = atoi(tmp.c_str());
+			
+			
+			getline(filein, tmp);
+			strcpy(cb.sanBayDen, tmp.c_str());
+			
+			getline(filein, tmp);
+			cb.trangThai = atoi(tmp.c_str());
+			if (Check_ThoiGian_ChuyenBay(cb.tgKhoiHanh) == false)
+				cb.trangThai = 3;
+				
+			getline(filein, tmp);
+			int sovedadat = atoi(tmp.c_str());
+			initListVe(cb.dsVe, getsocho(lmb, cb.soHieuMB));
+			for (int i = 0; i < sovedadat; i++)
+			{
+				getline(filein, tmp, '-');
+				cb.dsVe.ve[i].soGhe = atoi(tmp.c_str());
+				getline(filein, tmp);
+				strcpy(cb.dsVe.ve[i].cmnd, (tmp.c_str()));
+				InsertVe(cb.dsVe, cb.dsVe.ve[i].soGhe, cb.dsVe.ve[i].cmnd);
+			}
+			InsertLast_CB(lcb, cb);
+		}
+		
+	}while (!filein.eof());
 }
 
-int CheckSoHieu_MB(ListMayBay listMBCheckSoHieu, char sohieu[])
+int CheckSoHieu_MB(ListMayBay listMB, char sohieu[])
 {
-	if (Empty_MB(listMBCheckSoHieu))
+	if (Empty_MB(listMB))
 		return -1;
 	else
 	{
-		for (int i = 0; i < listMBCheckSoHieu.soluong; i++)
+		for (int i = 0; i < listMB.soluong; i++)
 		{
-			if (stricmp(listMBCheckSoHieu.listMB[i]->soHieuMB, sohieu) == 0)
+			if (stricmp(listMB.maybay[i]->soHieuMB, sohieu) == 0)
 				return i;
 		}
 		return -1;
@@ -860,21 +828,21 @@ int Check_MaCB(SingleList_CB listCB, char macb[])
 }
 
 
-void Delete_MB(ListMayBay &listMBDel, char sohieu[])
+void Delete_MB(ListMayBay &listMB, char sohieu[])
 {
-	for (int i = 0; i < listMBDel.soluong; i++)
+	for (int i = 0; i < listMB.soluong; i++)
 	{
-		if (strcmp(listMBDel.listMB[i]->soHieuMB, sohieu) == 0)
+		if (strcmp(listMB.maybay[i]->soHieuMB, sohieu) == 0)
 		{
-			MayBay* temp = listMBDel.listMB[i];
+			MayBay* temp = listMB.maybay[i];
 			int j = i+1;
-			for( j ; j < listMBDel.soluong; j++){
-				listMBDel.listMB[i] = listMBDel.listMB[j];
+			for( j ; j < listMB.soluong; j++){
+				listMB.maybay[i] = listMB.maybay[j];
 				i = j;
 			}
 			delete temp;
-			listMBDel.listMB[j] = NULL;
-			listMBDel.soluong--;
+			listMB.maybay[j] = NULL;
+			listMB.soluong--;
 			cout<<"Da xoa\n";
 			break;
 		}
@@ -883,12 +851,12 @@ void Delete_MB(ListMayBay &listMBDel, char sohieu[])
 	
 }
 
-void Xuat_MB(ListMayBay listmb)
+void Xuat_MB(ListMayBay listMB)
 {
-	cout<<"So luong: "<<listmb.soluong<<endl;
-	for (int i = 0; i < listmb.soluong; i++)
+	cout<<"So luong: "<<listMB.soluong<<endl;
+	for (int i = 0; i < listMB.soluong; i++)
 	{
-		cout<<listmb.listMB[i]->soHieuMB<<"\t"<<listmb.listMB[i]->loaiMB<<"\t"<<listmb.listMB[i]->soCho<<endl;
+		cout<<listMB.maybay[i]->soHieuMB<<"\t"<<listMB.maybay[i]->loaiMB<<"\t"<<listMB.maybay[i]->soCho<<endl;
 	}
 }
 
@@ -999,11 +967,16 @@ void PrintList_CB(SingleList_CB listCB)
 	for (; pTmp != NULL; pTmp = pTmp->pNext)
 	{
 		ChuyenBay cb = pTmp->cb;
-		cout<<cb.maCB<<"\t"
-			<<cb.soHieuMB<<"\t"
+		cout<<cb.soHieuMB<<"\t"
+			<<cb.maCB<<"\t"
 			<<cb.tgKhoiHanh.ngay<<"/"<<cb.tgKhoiHanh.thang<<"/"<<cb.tgKhoiHanh.nam<<"  "<<cb.tgKhoiHanh.gio<<":"<<cb.tgKhoiHanh.phut<<"\t"
 			<<cb.sanBayDen<<"\t"
 			<<cb.trangThai<<endl;
+		cout<<" --- DANH SACH VE ---"<<endl;
+		for (int i = 0; i < cb.dsVe.n; i++)
+		{
+			cout<<cb.dsVe.ve[i].soGhe<<"-"<<cb.dsVe.ve[i].cmnd<<endl;
+		}
 	}
 }
 
@@ -1476,9 +1449,9 @@ void Danh_Sach_MayBay(ListMayBay &lmb)
 		for (int i = 0; i < lmb.soluong; i++)
 		{
 			gotoxy(tabx + 4, taby + 3 + i); cout <<i+1;
-			gotoxy(tabx + 14, taby + 3 + i); cout<<lmb.listMB[i]->soHieuMB;
-			gotoxy(tabx + 35, taby + 3 + i); cout <<lmb.listMB[i]->loaiMB;
-			gotoxy(tabx + 60, taby + 3 + i); cout <<lmb.listMB[i]->soCho;
+			gotoxy(tabx + 14, taby + 3 + i); cout<<lmb.maybay[i]->soHieuMB;
+			gotoxy(tabx + 35, taby + 3 + i); cout <<lmb.maybay[i]->loaiMB;
+			gotoxy(tabx + 60, taby + 3 + i); cout <<lmb.maybay[i]->soCho;
 		}
 		int c = 0;
 		do{
@@ -1597,9 +1570,6 @@ string nhapSo(int x, int y){
 
 void NhapMayBay(ListMayBay &lmb)
 {
-	ifstream filein;
-	filein.open("maybay.txt", ios::in);
-	DocFileMayBay(lmb,filein);
 	int keyhit,x = 28;
 	int demfield = 0;
 	while (true)
@@ -1751,15 +1721,12 @@ void NhapMayBay(ListMayBay &lmb)
 
 void NhapChuyenBay(ListMayBay lmb, SingleList_CB &listCB)
 {
-	Init_CB(listCB);
-	ifstream filein;
-	filein.open("maybay.txt", ios::in);
-	DocFileMayBay(lmb,filein);
-	int keyhit,xThongBao = 14, yThongBao = 12;
-	int demfield = 0;
-	int socho = 0;
+
 	while (true)
 	{
+		int keyhit,xThongBao = 14, yThongBao = 12;
+		int demfield = 0;
+		int socho = 0;
 		
 		system("cls");
 		Box_NhapChuyenBayBay();
@@ -2104,13 +2071,14 @@ void NhapChuyenBay(ListMayBay lmb, SingleList_CB &listCB)
 			if (cb.sanBayDen == 0) break;
 			
 			int soCho = getsocho(lmb, cb.soHieuMB);
-			initListVe(cb.dsVe, soCho);
-			InsertVe(cb.dsVe, 1, "301574792");
-			InsertVe(cb.dsVe, 2, "301574791");
-			InsertVe(cb.dsVe, 5, "301574793");
+			
 			
 			if (demfield == 8)
 			{
+				initListVe(cb.dsVe, soCho);
+				InsertVe(cb.dsVe, 1, "301574792");
+				InsertVe(cb.dsVe, 2, "301574791");
+				InsertVe(cb.dsVe, 5, "301574793");
 				InsertLast_CB(listCB, cb);
 				gotoxy(boxx + xThongBao, boxy + yThongBao); cout<<"DA THEM THANH CONG";
 				Sleep(1500);  
@@ -2476,14 +2444,8 @@ void NhapHanhKhach(NODPTR &tree)
 //	
 //}
 	
-int Menu()
-{
-	SingleList_CB lcb;
-	ListMayBay lmb;
-	
-	ifstream filein;
-	filein.open("maybay.txt", ios::in);
-	DocFileMayBay(lmb, filein);
+void Menu(ListMayBay &lmb, SingleList_CB &lcb)
+{	
 	
 	int x = 15, y = 16;
 	int keyhit;
@@ -2632,12 +2594,20 @@ int main(int argc, char** argv) {
 
 	ListMayBay lmb;
 	SingleList_CB lcb;
-//	ThoiGian tg;
-//	tg.gio = 10;
-//	tg.phut = 25;
-//	tg.ngay = 30;
-//	tg.thang = 2;
-//	tg.nam = 2019;
+	Init_CB(lcb);
+	InitTreeHK(tree);
+	DocFileHanhKhach(tree);
+//	PrintTree(tree);
+	DocFileMayBay(lmb);
+//	Danh_Sach_MayBay(lmb);
+	DocFileChuyenBay(lcb, lmb);
+	
+//	NhapChuyenBay(lmb, lcb);
+	PrintList_CB(lcb);
+	
+	
+	
+
 //	bool check = Check_ThoiGian_ChuyenBay(tg);
 //	if (check) 
 //		cout<<"Thoi gian hop le";
@@ -2657,7 +2627,8 @@ int main(int argc, char** argv) {
 //	Menu();
 //	LoadMayBay(lst);
 
-	NhapChuyenBay(lmb, lcb);
+//	NhapChuyenBay(lmb, lcb);
+
 //	Init_CB(lcb);
 //	DocFileChuyenBay(lcb);
 //	PrintList_CB(lcb);
