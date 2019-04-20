@@ -64,13 +64,15 @@ using namespace std;
 //}
 
 // ======= VE ===========
-struct Ve{
-	int soGhe;
-	char cmnd[16];
-};
+//struct Ve{
+//	int soGhe;
+//	
+//};
 struct ListVe{
 	int n;
-	Ve *ve;
+//	char cmnd[16];
+	string *ve;
+
 };
 
 struct ThoiGian{
@@ -302,7 +304,7 @@ char *tach_Ten(char str[])
 
 char *tach_ho_dem(char str[])
 {
-	char hodem[150];
+	char hodem[100];
 	for (int i = strlen(str)-1; i >= 0; i--)
 		if (str[i] == ' ')
 		{
@@ -552,24 +554,25 @@ void DocFileHanhKhach(NODPTR &tree_hk)
 
 void initListVe(ListVe &dsVe, int soCho){
 	dsVe.n = 0;
-	dsVe.ve = new Ve[soCho];
+	dsVe.ve = new string[soCho];
 	for(int i = 0; i < soCho; i++ )
 	{
-		dsVe.ve[i].soGhe = i+1;
-		strcpy(dsVe.ve[i].cmnd, "");
+//		strcpy(dsVe.ve[i], "");
+		dsVe.ve[i] = "";
+		//cout<<i<<"-"<<dsVe.ve[i]<<"-"<<dsVe.ve[i].length()<<endl;
+//		strcpy(dsVe.ve[i].cmnd, "");
 	}
 }
 
-bool InsertVe(ListVe &list, int soGhe, char cmnd[])
+bool InsertVe(ListVe &list, int soGhe, string cmnd)
 {
 	
-	if (strlen(list.ve[soGhe-1].cmnd) > 0)
+	if ((list.ve[soGhe-1].length()) > 0)
 		return false;
 	else
 	{
 		
-		strcpy(list.ve[soGhe-1].cmnd, cmnd);
-		list.ve[soGhe-1].soGhe = soGhe;
+		list.ve[soGhe-1] = cmnd;
 		list.n++;
 		return true;
 	}
@@ -633,10 +636,8 @@ void LuuFileChuyenBay(SingleList_CB listCB, ListMayBay lmb)
 	ofstream fileout;
 	fileout.open("chuyenbay.txt", ios::out);
 	Node_CB *pTmp = listCB.pHead;
-	for ( ; pTmp != NULL; pTmp=pTmp->pNext)
-	{
+	for ( ; pTmp != NULL; pTmp=pTmp->pNext)	{
 		ChuyenBay cb;
-		
 		cb = pTmp->cb;
 		fileout << cb.soHieuMB << endl;
 		fileout << cb.maCB << "," 
@@ -647,26 +648,17 @@ void LuuFileChuyenBay(SingleList_CB listCB, ListMayBay lmb)
 				<< cb.tgKhoiHanh.phut << endl;
 		fileout << cb.sanBayDen <<endl;
 		fileout << cb.trangThai <<endl;
-		
-		int demsovedaban = 0;
 		int socho = getsocho(lmb, cb.soHieuMB);
-		for (int vitrighe = 0; vitrighe < socho; vitrighe++)
-		{
-			if (strlen(cb.dsVe.ve[vitrighe].cmnd) > 0)
+		for(int vitri = 0; vitri < socho; vitri++){
+			if((cb.dsVe.ve[vitri].length() > 0))
 			{
-				demsovedaban++;
+				fileout << vitri+1 << "-" << cb.dsVe.ve[vitri] << endl;
 			}
 		}
-		fileout << demsovedaban << endl;
-		for (int vitrighe = 0; vitrighe < socho; vitrighe++)
-		{
-			if (strlen(cb.dsVe.ve[vitrighe].cmnd) > 0)
-			{
-				fileout << cb.dsVe.ve[vitrighe].soGhe << "-" << cb.dsVe.ve[vitrighe].cmnd<<endl;
-			}
-		}
-
+		fileout << endl << endl;
 	}
+
+	fileout.close();
 }
 
 void LuuFileMayBay(ListMayBay listMB, ofstream &fileout)
@@ -720,6 +712,7 @@ void DocFileMayBay(ListMayBay &listmb)
 	getline(filein,tmp);
 	for (int i = 0; i < n; i++)
 	{
+
 		MayBay mb;
 		getline(filein, tmp, ',');
 		strcpy(mb.soHieuMB, tmp.c_str());
@@ -738,6 +731,7 @@ void DocFileMayBay(ListMayBay &listmb)
 
 bool Check_ThoiGian_ChuyenBay(ThoiGian tg);
 void InsertLast_CB(SingleList_CB &lcb, ChuyenBay cb);
+string *splitToTwoString(const string str, char splitchar);
 void DocFileChuyenBay(SingleList_CB &lcb, ListMayBay lmb)
 {
 	ifstream filein;
@@ -748,13 +742,12 @@ void DocFileChuyenBay(SingleList_CB &lcb, ListMayBay lmb)
 		ChuyenBay cb;
 		
 		getline(filein, tmp);
-		if (tmp != "")
-		{
+		if (tmp != ""){
 			strcpy(cb.soHieuMB, tmp.c_str());
 			
 			getline(filein, tmp, ',');
 			strcpy(cb.maCB, tmp.c_str());
-			
+			cout<<cb.maCB<<endl;
 			getline(filein, tmp, '/');
 			cb.tgKhoiHanh.ngay = atoi(tmp.c_str());
 			
@@ -773,27 +766,59 @@ void DocFileChuyenBay(SingleList_CB &lcb, ListMayBay lmb)
 			
 			getline(filein, tmp);
 			strcpy(cb.sanBayDen, tmp.c_str());
-			
+			cout<<cb.sanBayDen<<endl;
 			getline(filein, tmp);
 			cb.trangThai = atoi(tmp.c_str());
 			if (Check_ThoiGian_ChuyenBay(cb.tgKhoiHanh) == false)
 				cb.trangThai = 3;
 				
-			getline(filein, tmp);
-			int sovedadat = atoi(tmp.c_str());
+//			getline(filein, tmp);
+			//int sovedadat = atoi(tmp.c_str());
 			initListVe(cb.dsVe, getsocho(lmb, cb.soHieuMB));
-			for (int i = 0; i < sovedadat; i++)
+//			for (int i = 0; i < sovedadat; i++)
+//			{
+//				string ghe, cmnd;
+//				getline(filein, ghe, '-');
+//				int vitri = atoi(ghe.c_str());
+//				getline(filein, cmnd);
+//				cb.dsVe.ve[vitri] = cmnd;
+//				InsertVe(cb.dsVe, vitri, cb.dsVe.ve[vitri]);
+//			}
+			string tmp1 = "";
+			getline(filein, tmp1);
+			
+			while(tmp1 != "")
 			{
-				getline(filein, tmp, '-');
-				cb.dsVe.ve[i].soGhe = atoi(tmp.c_str());
-				getline(filein, tmp);
-				strcpy(cb.dsVe.ve[i].cmnd, (tmp.c_str()));
-				InsertVe(cb.dsVe, cb.dsVe.ve[i].soGhe, cb.dsVe.ve[i].cmnd);
+				string *arrVe = splitToTwoString(tmp1, '-');
+				string ghe = arrVe[0];
+				string cmnd = arrVe[1];
+				cout<<ghe<<endl;
+				cout<<cmnd<<endl;
+				
+				InsertVe(cb.dsVe, atoi(ghe.c_str()), cmnd);
+				getline(filein, tmp1);
+				
 			}
+			
 			InsertLast_CB(lcb, cb);
+			tmp = "";
 		}
 		
 	}while (!filein.eof());
+}
+
+string* splitToTwoString(const string str, char splitchar){
+	int pos = 0;
+	string* arr = new string[2];
+	arr[0] = "";
+	arr[1] = "";
+	for(pos; pos < str.length();pos ++){
+		if(str.at(pos) == splitchar){
+			arr[0] = str.substr(0,pos); // 12-
+			arr[1] = str.substr(pos+1, str.length()-pos);
+		}
+	}
+	return arr;
 }
 
 int CheckSoHieu_MB(ListMayBay listMB, char sohieu[])
@@ -964,7 +989,7 @@ void PrintList_CB(SingleList_CB listCB)
 		cout<<"Danh sach rong!";
 		return;
 	}
-	for (; pTmp != NULL; pTmp = pTmp->pNext)
+	for (pTmp; pTmp != NULL; pTmp = pTmp->pNext)
 	{
 		ChuyenBay cb = pTmp->cb;
 		cout<<cb.soHieuMB<<"\t"
@@ -975,7 +1000,8 @@ void PrintList_CB(SingleList_CB listCB)
 		cout<<" --- DANH SACH VE ---"<<endl;
 		for (int i = 0; i < cb.dsVe.n; i++)
 		{
-			cout<<cb.dsVe.ve[i].soGhe<<"-"<<cb.dsVe.ve[i].cmnd<<endl;
+			if (cb.dsVe.ve[i] != "")
+				cout<<i+1<<"-"<<cb.dsVe.ve[i]<<endl;
 		}
 	}
 }
@@ -1057,7 +1083,7 @@ bool Them_Ve_Duoc(ChuyenBay cb,int socho) {
 //kiem tra vi tri ghe trong ko
 bool Check_ViTri_Ghe(SingleList_CB lcb, int vitri) {
 	Node_CB *pTmp = lcb.pHead;
-	if (pTmp->cb.dsVe.ve[vitri].cmnd != "") {
+	if (pTmp->cb.dsVe.ve[vitri] != "") {
 		return true;
 	}
 	else return false;
@@ -2078,7 +2104,7 @@ void NhapChuyenBay(ListMayBay lmb, SingleList_CB &listCB)
 				initListVe(cb.dsVe, soCho);
 				InsertVe(cb.dsVe, 1, "301574792");
 				InsertVe(cb.dsVe, 2, "301574791");
-				InsertVe(cb.dsVe, 5, "301574793");
+				InsertVe(cb.dsVe, 19, "301574793");
 				InsertLast_CB(listCB, cb);
 				gotoxy(boxx + xThongBao, boxy + yThongBao); cout<<"DA THEM THANH CONG";
 				Sleep(1500);  
@@ -2248,139 +2274,153 @@ void NhapHanhKhach(NODPTR &tree)
 			}
 	}
 }
+bool Check_ListVe_Full(ChuyenBay cb,int socho) {
+	int dem = 0;
+	for (int i = 0; i < socho; i++) {
+		if (cb.dsVe.ve[i] != ""){
+			dem++;
+		}
+	}
+	if (dem == socho) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
 
-////void Dat_Ve(ListMayBay lmb, SingleList_CB &lcb, NODPTR &tree)
-////{
-//	DocFileHanhKhach(tree);
-////	char cmnd[16];
-//	while (true)
-//	{
-//		system("cls");
-//		Box_DatVe();
-//		SetColor(ColorWHITE);
-//		ChuyenBay cb;
-//		string temp;
-//		char macb[15], cmnd[16], chonGhe[15];
-//		int vitri = 0, soGhe = -1, socho = 0;
-//	NhapMaCB:
-//		do{
-//			temp = nhapChuoi(1,1);
-//			if (temp == "exit")
+void Dat_Ve(ListMayBay lmb, SingleList_CB &lcb, NODPTR &tree)
+{
+
+	char cmnd[16];
+	while (true)
+	{
+		system("cls");
+		Box_DatVe();
+		SetColor(ColorWHITE);
+		ChuyenBay cb;
+		string temp;
+		char macb[15], cmnd[16], chonGhe[15];
+		int vitri = 0, soGhe = -1, socho = 0;
+	NhapMaCB:
+		do{
+			temp = nhapChuoi(1,1);
+			if (temp == "exit") return;
 //				goto THOAT;
-//			strcpy(macb, temp.c_str());
-//			strcpy(macb, fix_Ma(macb));
-//			if (Check_MaCB(lcb, macb) == true)
-//			{
-//				if (lmb.soluong > 0)
+			strcpy(macb, temp.c_str());
+			strcpy(macb, fix_Ma(macb));
+			if (Check_MaCB(lcb, macb) == true)
+			{
+				if (lmb.soluong > 0)
+				{
+					for (int i = 0; i < lmb.soluong; i++)
+					{
+						if (TimKiem_CB(lcb, macb) != NULL)
+						{
+							socho = lmb.maybay[i]->soCho;
+							
+							if (Check_ListVe_Full(TimKiem_CB(lcb, macb)->cb, socho) == false)
+							{
+								cb = TimKiem_CB(lcb, macb)->cb;
+								if (cb.trangThai == 3)
+								{
+									gotoxy(30, 25); cout << "Chuyen bay da cat canh vui long chon chuyen bay khac!!";
+									Sleep(1500);
+									gotoxy(30, 25); cout << "                                                       ";
+									gotoxy(41, 5); cout << "         ";
+									strcpy(macb,"");
+									goto NhapMaCB;
+								}
+								else if (cb.trangThai == 0)
+								{
+									gotoxy(30, 25); cout << "Chuyen bay da huy vui long chon chuyen bay khac!!";
+									Sleep(1500);
+									gotoxy(30, 25); cout << "                                                  ";
+									gotoxy(41, 5); cout << "         ";
+									strcpy(macb,"");
+									goto NhapMaCB;
+								}
+								else
+								{
+									vitri = i; //danh dau vi tri may bay trong danh sach tuyen tinh
+									goto NhapCMND;
+								}
+							}
+								
+						}
+						else if (Check_ListVe_Full(TimKiem_CB(lcb, macb)->cb, socho) == true) 
+						{
+							gotoxy(30, 25); cout << "Ve da ban het vui long chon chuyen bay khac!!";
+							Sleep(1000);
+							gotoxy(30, 25); cout << "                                             ";
+							strcpy(macb, "");
+							goto NhapMaCB;
+						}
+					}
+					gotoxy(30, 25); cout << "Ma chuyen bay khong ton tai!";
+					Sleep(1000);
+					gotoxy(30, 25); cout << "                            ";
+					gotoxy(41, 5); cout << "           ";
+					strcpy(macb, "");
+					goto NhapMaCB;
+				}	
+			}
+		}while(strcmp(macb, "") == 0);
+	NhapCMND:
+		do{
+			temp = nhapChuoi(41, 8);
+			if (temp == "exit") return;
+//				goto THOAT;
+			strcpy(cmnd, temp.c_str());
+			strcpy(cmnd, fix_Ma(cmnd));
+			if (temp != "exit")
+			{
+				if (SearchHK(tree, cmnd) != NULL)
+				{
+					Node_HK *pHK = SearchHK(tree, cmnd);
+					gotoxy(59, 7); 	cout << pHK->HK.ho;
+					gotoxy(59, 9); 	cout << pHK->HK.ten;
+					gotoxy(59, 11); cout <<	pHK->HK.phai;
+					goto DanhsachGhe;
+				}
+//				else if (Seach_Key(root, cmnd) == NULL) 
 //				{
-//					for (int i = 0; i < lmb.soluong; i++)
-//					{
-//						if (TimKiem_CB(lcb, macb) != NULL)
-//						{
-//							socho = lmb.listMB[i]->soCho;
-//							
-//							if (Check_ListVe(TimKiem_CB(lcb, macb)->cb, socho) == false)
-//							{
-//								cb = TimKiem_CB(lcb, macb)->cb;
-//								if (cb.trangThai == 3)
-//								{
-//									gotoxy(30, 25); cout << "Chuyen bay da cat canh vui long chon chuyen bay khac!!";
-//									Sleep(1500);
-//									gotoxy(30, 25); cout << "                                                       ";
-//									gotoxy(41, 5); cout << "         ";
-//									strcpy(macb,"");
-//									goto NhapMaCB;
-//								}
-//								else if (cb.trangThai == 0)
-//								{
-//									gotoxy(30, 25); cout << "Chuyen bay da huy vui long chon chuyen bay khac!!";
-//									Sleep(1500);
-//									gotoxy(30, 25); cout << "                                                  ";
-//									gotoxy(41, 5); cout << "         ";
-//									strcpy(macb,"");
-//									goto NhapMaCB;
-//								}
-//								else
-//								{
-//									vitri = i; //danh dau vi tri may bay trong danh sach tuyen tinh
-//									goto NhapCMND;
-//								}
-//							}
-//								
-//						}
-//						else if (Check_ListVe(TimKiem_CB(lcb, macb)->cb, socho) == true) 
-//						{
-//							gotoxy(30, 25); cout << "Ve da ban het vui long chon chuyen bay khac!!";
-//							Sleep(1000);
-//							gotoxy(30, 25); cout << "                                             ";
-//							strcpy(macb, "");
-//							goto NhapMaCB;
-//						}
-//					}
-//					gotoxy(30, 25); cout << "Ma chuyen bay khong ton tai!";
+//					gotoxy(10, 25); cout << "Hanh khach khong ton tai";
+//					gotoxy(10, 26); cout << "Nhan Enter de tiep tuc!!";
 //					Sleep(1000);
-//					gotoxy(30, 25); cout << "                            ";
-//					gotoxy(41, 5); cout << "           ";
-//					strcpy(macb, "");
+//					gotoxy(10, 25); cout << "                         ";
+//					gotoxy(10, 26); cout << "                         ";
+//					ThemHanhKhach(root);
+//					system("cls");
+//					Design_DatVe();
 //					goto NhapMaCB;
-//				}	
-//			}
-//		}while(strcmp(macb, "") == 0);
-//	NhapCMND:
-//		do{
-//			temp = nhapChuoi(41, 8);
-//			if (temp == "exit")
-//				goto THOAT;
-//			strcpy(cmnd, temp.c_str());
-//			strcpy(cmnd, fix_Ma(cmnd));
-//			if (temp != "exit")
-//			{
-//				if (SearchHK(tree, cmnd) != NULL)
-//				{
-//					Node_HK *pHK = SearchHK(tree, cmnd);
-//					gotoxy(59, 7); 	cout << pHK->HK.ho;
-//					gotoxy(59, 9); 	cout << pHK->HK.ten;
-//					gotoxy(59, 11); cout <<	pHK->HK.phai;
-//					goto DanhsachGhe;
 //				}
-////				else if (Seach_Key(root, cmnd) == NULL) 
-////				{
-////					gotoxy(10, 25); cout << "Hanh khach khong ton tai";
-////					gotoxy(10, 26); cout << "Nhan Enter de tiep tuc!!";
-////					Sleep(1000);
-////					gotoxy(10, 25); cout << "                         ";
-////					gotoxy(10, 26); cout << "                         ";
-////					ThemHanhKhach(root);
-////					system("cls");
-////					Design_DatVe();
-////					goto NhapMaCB;
-////				}
-//			}
-//		}while(strcmp(cmnd, "") == 0);
-//		DanhsachGhe:
-//			SetColor(ColorWHITE);
-//			SetBGColor(ColorGREEN);
-//			int cot = 10, dong = 35;
-//			gotoxy(30, 30);
-//			cout << "CHUONG TRINH QUAN LY CHUYEN BAY";
-//			for (int i = 0; i < socho; i++) {
-//				if (strcmp(cb.dsVe.ve[i].cmnd, "") == 0) {
-//					SetColor(ColorWHITE);
-//					SetBGColor(ColorGREEN);
-//					gotoxy(cot, dong); cout << "ghe " << i;
-//					cot = cot + 10;
-//				}
-//				else if (strcmp(cb.dsVe.ve[i].cmnd, "") != 0) {
-//					SetColor(ColorWHITE);
-//					SetBGColor(ColorRED);
-//					gotoxy(cot, dong); cout << "ghe " << i;
-//					cot = cot + 10;
-//				}
-//				if (cot % 80 == 0) {
-//					dong = dong + 1;
-//					cot = 10;
-//				}
-//			}
+			}
+		}while(strcmp(cmnd, "") == 0);
+		DanhsachGhe:
+			SetColor(ColorWHITE);
+			SetBGColor(ColorGREEN);
+			int cot = 10, dong = 35;
+			gotoxy(30, 30);
+			cout << "CHUONG TRINH QUAN LY CHUYEN BAY";
+			for (int i = 0; i < socho; i++) {
+				if (cb.dsVe.ve[i] == "") {
+					SetColor(ColorWHITE);
+					SetBGColor(ColorGREEN);
+					gotoxy(cot, dong); cout << "ghe " << i;
+					cot = cot + 10;
+				}
+				else if (cb.dsVe.ve[i] != "") {
+					SetColor(ColorWHITE);
+					SetBGColor(ColorRED);
+					gotoxy(cot, dong); cout << "ghe " << i;
+					cot = cot + 10;
+				}
+				if (cot % 80 == 0) {
+					dong = dong + 1;
+					cot = 10;
+				}
+			}
 //			goto chonvitri;
 //		chonvitri:
 //			do
@@ -2396,7 +2436,7 @@ void NhapHanhKhach(NODPTR &tree)
 //				soGhe = atoi(chonGhe);
 //				if (soGhe != 0) {
 //					if (soGhe < socho) {
-//						if (strcmp(cb.dsVe.ve[soGhe].cmnd, "") != 0) {
+//						if (cb.dsVe.ve[soGhe] != "") {
 //							gotoxy(30, 25); cout << "Vi tri da duoc chon vui long chon lai!";
 //							Sleep(1000);
 //							gotoxy(30, 25); cout << "                                       ";
@@ -2404,7 +2444,7 @@ void NhapHanhKhach(NODPTR &tree)
 //							strcpy(chonGhe, "");
 //							goto chonvitri;
 //						}
-//						else if (strcmp(cb.dsVe.ve[soGhe].cmnd, "") == 0) {
+//						else if (cb.dsVe.ve[soGhe] == "") {
 //							goto LUU;
 //						}
 //					}
@@ -2418,31 +2458,31 @@ void NhapHanhKhach(NODPTR &tree)
 //					}
 //				}
 //			} while (temp ==  "exit");
-//		LUU:
-//			strcpy(cb.dsVe.ve[vitri].cmnd, cmnd);
-//		THOAT:
-//			break;		
+//	LUU:
+//			cb.dsVe.ve[vitri] = cmnd;
+//	THOAT:
+				
+			
+//		gotoxy(17, 8); string temp = nhapChuoi(17, 8);
+//		strcpy(cmnd, temp.c_str());
+//		strcpy(cmnd, fix_Ma(cmnd));
+//		gotoxy(17, 8); cout<<cmnd;
+//		if (CheckCMNDIsExisted(tree, cmnd) == 1)
+//		{
+//			Node_HK *pHK = SearchHK(tree, cmnd);
 //			
-////		gotoxy(17, 8); string temp = nhapChuoi(17, 8);
-////		strcpy(cmnd, temp.c_str());
-////		strcpy(cmnd, fix_Ma(cmnd));
-////		gotoxy(17, 8); cout<<cmnd;
-////		if (CheckCMNDIsExisted(tree, cmnd) == 1)
-////		{
-////			Node_HK *pHK = SearchHK(tree, cmnd);
-////			
-////			gotoxy(59, 7); 	cout << pHK->HK.ho;
-////			gotoxy(59, 9); 	cout << pHK->HK.ten;
-////			gotoxy(59, 11); cout <<	pHK->HK.phai;
-////		}
-////		else
-////		{
-////			gotoxy(76,5);  cout << "KHONG CO! ";
-////			Sleep(1500);
-////		}
-//	}
-//	
-//}
+//			gotoxy(59, 7); 	cout << pHK->HK.ho;
+//			gotoxy(59, 9); 	cout << pHK->HK.ten;
+//			gotoxy(59, 11); cout <<	pHK->HK.phai;
+//		}
+//		else
+//		{
+//			gotoxy(76,5);  cout << "KHONG CO! ";
+//			Sleep(1500);
+//		}
+	}
+	
+}
 	
 void Menu(ListMayBay &lmb, SingleList_CB &lcb)
 {	
@@ -2597,45 +2637,15 @@ int main(int argc, char** argv) {
 	Init_CB(lcb);
 	InitTreeHK(tree);
 	DocFileHanhKhach(tree);
-//	PrintTree(tree);
+
 	DocFileMayBay(lmb);
-//	Danh_Sach_MayBay(lmb);
+
 	DocFileChuyenBay(lcb, lmb);
 	
 //	NhapChuyenBay(lmb, lcb);
-	PrintList_CB(lcb);
-	
-	
-	
-
-//	bool check = Check_ThoiGian_ChuyenBay(tg);
-//	if (check) 
-//		cout<<"Thoi gian hop le";
-//	else cout<<"Thoig gian khong hop le";
-//	LuuFileHKKoDeQuy(tree);
-//	ofstream fileout;
-//	fileout.open("hanhkhach.txt", ios::out);
-//	LuuFileHanhKhach(tree, fileout);
-//	fileout.close();
-	
-//	DocFileHanhKhach(tree);
-//	cout<<endl;
-//	PrintTree(tree);
-
-//	NhapHanhKhach(tree);
-//	NhapMayBay(lst); 
-//	Menu();
-//	LoadMayBay(lst);
-
-//	NhapChuyenBay(lmb, lcb);
-
-//	Init_CB(lcb);
-//	DocFileChuyenBay(lcb);
 //	PrintList_CB(lcb);
-//	Box_DatVe();
-//	Box_NhapChuyenBayBay();
-//	NhapHanhKhach(tree);
-//	Dat_Ve(lmb, lcb, tree);
-	
+
+	Menu();
+
 	return 0;
 }
