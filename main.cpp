@@ -287,7 +287,8 @@ char *fix_Ma(char ma[])
 
 char *tach_Ten(char str[])
 {
-	char *ten;
+	char *ten = new char[100];
+	
 	for (int i = strlen(str)-1; i >= 0; i--)
 		if (str[i] == ' ')
 		{
@@ -304,7 +305,8 @@ char *tach_Ten(char str[])
 
 char *tach_ho_dem(char str[])
 {
-	char hodem[100];
+	char *hodem = new char[100];
+
 	for (int i = strlen(str)-1; i >= 0; i--)
 		if (str[i] == ' ')
 		{
@@ -318,7 +320,7 @@ char *tach_ho_dem(char str[])
 		}
 	return hodem;
 }
-char *fix_HoTen(char hoten[])
+char *fix_HoTen(char *hoten)
 {
 	if( strcmp(hoten, "\0") == 0)
 		return hoten;
@@ -381,7 +383,7 @@ char *fix_HoTen(char hoten[])
 	}
 	return hoten;
 }
-char *fix_Ten(char ma[])
+char *fix_Ten(char *ma)
 {
 	if( strcmp(ma, "\0") == 0)
 		return ma;
@@ -433,14 +435,14 @@ char *fix_Ten(char ma[])
 	return ma;
 }
 
-char *fix_GioiTinh(char phai[])
+char *fix_GioiTinh(char *phai)
 {
-	if( strcmp(phai, "\0") == 0)
+	if (strcmp(phai, "\0") == 0)
 		return phai;
 		
 	int dai = strlen(phai);
 	int dem = 0;
-	for(int i = 0; i < dai; i++)
+	for (int i = 0; i < dai; i++)
 	{
 		if (phai[i] == ' ')
 			dem++;
@@ -747,7 +749,7 @@ void DocFileChuyenBay(SingleList_CB &lcb, ListMayBay lmb)
 			
 			getline(filein, tmp, ',');
 			strcpy(cb.maCB, tmp.c_str());
-			cout<<cb.maCB<<endl;
+//			cout<<cb.maCB<<endl;
 			getline(filein, tmp, '/');
 			cb.tgKhoiHanh.ngay = atoi(tmp.c_str());
 			
@@ -766,7 +768,7 @@ void DocFileChuyenBay(SingleList_CB &lcb, ListMayBay lmb)
 			
 			getline(filein, tmp);
 			strcpy(cb.sanBayDen, tmp.c_str());
-			cout<<cb.sanBayDen<<endl;
+//			cout<<cb.sanBayDen<<endl;
 			getline(filein, tmp);
 			cb.trangThai = atoi(tmp.c_str());
 			if (Check_ThoiGian_ChuyenBay(cb.tgKhoiHanh) == false)
@@ -792,8 +794,8 @@ void DocFileChuyenBay(SingleList_CB &lcb, ListMayBay lmb)
 				string *arrVe = splitToTwoString(tmp1, '-');
 				string ghe = arrVe[0];
 				string cmnd = arrVe[1];
-				cout<<ghe<<endl;
-				cout<<cmnd<<endl;
+//				cout<<ghe<<endl;
+//				cout<<cmnd<<endl;
 				
 				InsertVe(cb.dsVe, atoi(ghe.c_str()), cmnd);
 				getline(filein, tmp1);
@@ -2484,7 +2486,7 @@ void Dat_Ve(ListMayBay lmb, SingleList_CB &lcb, NODPTR &tree)
 	
 }
 	
-void Menu(ListMayBay &lmb, SingleList_CB &lcb)
+int Menu(ListMayBay &lmb, SingleList_CB &lcb)
 {	
 	
 	int x = 15, y = 16;
@@ -2512,7 +2514,7 @@ void Menu(ListMayBay &lmb, SingleList_CB &lcb)
 	for(int i = 1; i <= 9; i++){
 		gotoxy(x, y+i); cout << menu_text[i];
 	}
-	SetBGColor(9);
+	SetBGColor(ColorBLUE);
 	gotoxy(x, 16); cout << menu_text[0];
 
 	do{
@@ -2543,7 +2545,7 @@ void Menu(ListMayBay &lmb, SingleList_CB &lcb)
 						SetBGColor(0);
 						SetColor(15);
 						system("cls");
-						NhapMayBay(lmb);
+//						NhapMayBay(lmb);
 						goto Menu;
 					}	
 					case 1:
@@ -2551,7 +2553,7 @@ void Menu(ListMayBay &lmb, SingleList_CB &lcb)
 						SetBGColor(0);
 						SetColor(15);
 						system("cls");
-						NhapChuyenBay(lmb, lcb);
+//						NhapChuyenBay(lmb, lcb);
 						goto Menu;
 					}
 					case 2:
@@ -2622,8 +2624,7 @@ void Menu(ListMayBay &lmb, SingleList_CB &lcb)
 		gotoxy(15, y); 
 		SetBGColor(9);
 		cout << menu_text[y-16];
-
-		
+	
 	}while(true);
 }
 
@@ -2645,7 +2646,7 @@ int main(int argc, char** argv) {
 //	NhapChuyenBay(lmb, lcb);
 //	PrintList_CB(lcb);
 
-	Menu();
+	Menu(lmb, lcb);
 
 	return 0;
 }
