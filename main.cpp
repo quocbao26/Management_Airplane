@@ -851,6 +851,17 @@ int CheckSoHieu_MB(ListMayBay listMB, char sohieu[])
 	}
 }
 
+ChuyenBay *SearchCB(SingleList_CB lcb, char maCB[])
+{
+	Node_CB *pNode = lcb.pHead;
+	while (pNode != NULL)
+	{
+		if (strcmp(pNode->cb.maCB, maCB) == 0)
+			return &pNode->cb;
+	}
+	return NULL;
+}
+
 int Check_MaCB(SingleList_CB listCB, char macb[])
 {
 	Node_CB *pTmp = listCB.pHead;
@@ -897,9 +908,7 @@ void Delete_MB(ListMayBay &listMB, char sohieu[])
 			cout<<"Da xoa\n";
 			break;
 		}
-		
 	}
-	
 }
 
 void Xuat_MB(ListMayBay listMB)
@@ -976,30 +985,38 @@ bool Delete_CB_Theo_Ma(SingleList_CB &listCB, char ma[])
 		}
 		else
 		{
-			if (pDel == listCB.pHead)
+			if (pDel->cb.trangThai == 3)
 			{
-				listCB.pHead = listCB.pHead->pNext;
-				pDel->pNext = NULL;
-				delete pDel;
-				pDel = NULL;
-				return true;
-			}
-			else if (pDel->pNext == NULL)
-			{
-				listCB.pTail = pPre;
-				pPre->pNext = NULL;
-				delete pDel;
-				pDel = NULL;
-				return true;
+				if (pDel == listCB.pHead)
+				{
+					listCB.pHead = listCB.pHead->pNext;
+					pDel->pNext = NULL;
+					delete pDel;
+					pDel = NULL;
+					return true;
+				}
+				else if (pDel->pNext == NULL)
+				{
+					listCB.pTail = pPre;
+					pPre->pNext = NULL;
+					delete pDel;
+					pDel = NULL;
+					return true;
+				}
+				else
+				{
+					pPre->pNext = pDel->pNext;
+					pDel->pNext = NULL;
+					delete pDel;
+					pDel = NULL;
+					return true;
+				}	
 			}
 			else
 			{
-				pPre->pNext = pDel->pNext;
-				pDel->pNext = NULL;
-				delete pDel;
-				pDel = NULL;
-				return true;
+				return false;
 			}
+			
 		}
 	}
 	
@@ -2511,13 +2528,13 @@ void XoaMayBay(ListMayBay &lmb)
 		if (x == -1)
 		{
 			SetColor(ColorWHITE); SetBGColor(ColorBLACK);
-			gotoxy(35,12); cout<<"Khong tim thay chuyen bay nay!";
+			gotoxy(35,12); cout<<"Khong tim thay may bay nay!";
 			Sleep(1000);
 			gotoxy(35,12); cout<<"            					";
 			goto NhapMA;
 		}
-			
-		for (int i = x; i < lmb.soluong; i++)
+		int i;	
+		for (i = x; i < lmb.soluong; i++)
 		{
 			lmb.maybay[i] = lmb.maybay[i+1];
 		}
@@ -2987,7 +3004,44 @@ void NhapChuyenBay(ListMayBay lmb, SingleList_CB &listCB)
 		LuuFileChuyenBay(listCB, lmb);
 	}
 }
-
+ void XoaChuyenBay(SingleList_CB &lcb){
+ 	NhapMA:
+		system("cls");
+		frame_NhapMaMayBay(40,8);
+		char maCB[15];
+		gotoxy(45, 9); SetColor(ColorPURPLE); SetBGColor(ColorWHITE);
+		string ma = nhapChuoi(45,9);
+		if (ma == "exit")
+			return;
+		strcpy(maCB, ma.c_str());
+		strcpy(maCB, fix_Ma(maCB));
+		int x = Check_MaCB(lcb, maCB);
+		if (x == -1)
+		{
+			SetColor(ColorWHITE); SetBGColor(ColorBLACK);
+			gotoxy(35,12); cout<<"Khong tim thay chuyen bay nay!";
+			Sleep(1000);
+			gotoxy(35,12); cout<<"            					";
+			goto NhapMA;
+		}
+		else{
+//			ChuyenBay *cb = SearchCB(lcb, maCB);
+			bool flag = Delete_CB_Theo_Ma(lcb, maCB);
+			if (flag){
+				gotoxy(35,12); cout<<"Xoa chuyen bay thang cong!";
+				Sleep(1000);
+				gotoxy(35,12); cout<<"            					";
+			}
+			else
+			{
+				gotoxy(35,12); cout<<"Chuyen bay nay khong co hoac chua bay. Khong the xoa";
+				Sleep(1000);
+				gotoxy(35,12); cout<<"            										  ";
+				goto NhapM
+			}
+		}
+		
+ }
 
 int CountCB(SingleList_CB lcb)
 {
@@ -3097,7 +3151,7 @@ void Danh_Sach_ChuyenBay(SingleList_CB &lcb, ListMayBay lmb)
 		else if (c == F2)
 		{
 			Sleep(500);
-//			XoaMayBay(lmb);
+			XoaChuyenBay(lcb);
 			system("cls");
 			goto Xuat;
 		}
@@ -3199,7 +3253,7 @@ void Danh_Sach_HK_Trong_CB(SingleList_CB lcb, ListMayBay lmb)
 				strcat(hoten, pHK->HK.ho );
 				strcat(hoten, " ");
 				strcat(hoten, pHK->HK.ten);
-				
+			
 				gotoxy(tabx + 4, taby + 3 + dem); 	cout<<dem+1;
 				gotoxy(tabx + 14, taby + 3 + dem); 	cout<<i+1;
 				gotoxy(tabx + 25, taby + 3 + dem); 	cout<<pNodeCB->cb.dsVe.ve[i];
