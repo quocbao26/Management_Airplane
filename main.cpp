@@ -239,7 +239,16 @@ void InsertHKToTree(NODPTR &tree_hk, HanhKhach hk)
 			InsertHKToTree(tree_hk->pRight, hk);
 	}
 }
-
+int check_Chuoi_Char(char ma[])
+{
+	for(int i = 0; i < strlen(ma); i++){
+//		gotoxy(1,1); cout<<ma[i]<<endl;
+//		system("pause");
+		if (!isdigit(ma[i]))
+			return -1;
+	}
+	return 1;
+} 
 void XoaKiTu(char s[], int vitrixoa)
 {
 	int n = strlen(s);
@@ -247,7 +256,7 @@ void XoaKiTu(char s[], int vitrixoa)
 		s[i-1] = s[i];
 	s[n-1] = '\0';
 }
-char *fix_Ma(char ma[])
+char *fix_Ma(char *ma)
 {
 	if( strcmp(ma, "\0") == 0)
 		return ma;
@@ -1233,10 +1242,10 @@ void ButtonThem(int color)
 }
 void ButtonHuyChuyen(int color)
 {
-	gotoxy(105, 16); SetBGColor(color); 						cout << "            ";
-	gotoxy(105, 17); SetBGColor(color); SetColor(ColorBLACK);	cout << "     F4     ";
 	gotoxy(105, 18); SetBGColor(color); 						cout << "            ";
-	gotoxy(105, 19); SetBGColor(ColorBLACK); SetColor(ColorWHITE);	cout << " HUY CHUYEN ";
+	gotoxy(105, 19); SetBGColor(color); SetColor(ColorBLACK);	cout << "     F4     ";
+	gotoxy(105, 20); SetBGColor(color); 						cout << "            ";
+	gotoxy(105, 21); SetBGColor(ColorBLACK); SetColor(ColorWHITE);	cout << " HUY CHUYEN ";
 }
 
 void ButtonXoa(int color)
@@ -2075,7 +2084,7 @@ void TableChuyenBay()
 	gotoxy(tabx + 83, taby + tabw); cout << char(193);
 	
 	gotoxy(tabx + 84, taby + 1); cout<<"TRANG THAI";
-	
+	BoxTrangThai(ColorWHITE);
 }
 
 int XacNhanSaveFile()
@@ -2156,7 +2165,7 @@ int XacNhanHuyVe()
 	SetBGColor(ColorDARKWHITE);
 					cout << "                                ";
 	gotoxy(60, 16); cout << "                                ";
-	gotoxy(60, 17); cout << "  	BAN CO MUON HUY VE KHONG?    ";
+	gotoxy(60, 17); cout << "   BAN CO MUON HUY VE KHONG ?   ";
 	gotoxy(60, 18); cout << "                                ";
 	gotoxy(60, 19); cout << "     YES                NO      ";
 	gotoxy(60, 20); cout << "                                ";
@@ -2294,7 +2303,7 @@ int XacNhanThemHanhKhach()
 	SetBGColor(ColorDARKWHITE);
 					cout << "                                 ";
 	gotoxy(60, 16); cout << "   HANH KHACH NAY KHONG TON TAI  ";
-	gotoxy(60, 17); cout << "  	BAN CO MUON THEM KHONG?    	  ";
+	gotoxy(60, 17); cout << "   BAN CO MUON THEM KHONG ?      ";
 	gotoxy(60, 18); cout << "                                 ";
 	gotoxy(60, 19); cout << "     YES                NO       ";
 	gotoxy(60, 20); cout << "                                 ";
@@ -2559,7 +2568,7 @@ void NhapMayBay(ListMayBay &lmb)
 					else
 					{
 						int soCho = atoi(cho);
-						if (soCho < 3)
+						if (soCho < 20)
 						{
 							gotoxy(boxx + 14, boxy + 10); cout<<"CHI NHAN SO VA PHAI LON HON 20!";
 							Sleep(1000);  
@@ -3793,312 +3802,331 @@ void Danh_Sach_ChuyenBay(SingleList_CB &lcb, ListMayBay lmb)
 	}	
 }
 
+bool Check_ThoiGian_NoiDen(ChuyenBay cb, ThoiGian tg, char noiDen[])
+{
+	ThoiGian thoiGian = cb.tgKhoiHanh;
+	if (thoiGian.nam == tg.nam && thoiGian.thang == tg.thang && thoiGian.ngay == tg.ngay && strcmp(cb.sanBayDen, noiDen) == 0)
+		return true;
+	return false;
+}
+
+int soLuong_CB_TG_ND(SingleList_CB lcb, ThoiGian tg, char noiden[])
+{
+	int count = 0;
+	for(Node_CB *pNodeCB = lcb.pHead; pNodeCB != NULL; pNodeCB=pNodeCB->pNext)
+	{
+		if (Check_ThoiGian_NoiDen(pNodeCB->cb, tg, noiden) == true)
+		{
+			count++;
+		}
+	}
+	return count;
+}
+
 void frame_NhapNgay_NoiDen(int x, int y);
-void Danh_Sach_ChuyenBay_Trong_Ngay(SingleList_CB &lcb, ListMayBay lmb)
+void Danh_Sach_ChuyenBay_Trong_Ngay(SingleList_CB lcb, ListMayBay lmb)
 {	
+		int xThongBao = 40, yThongBao = 17;
 	NhapLai:
+		int trang = 0, tongtrang = 0;
+		ThoiGian tg;
+		tg.nam = -1;
+		tg.thang = -1;
+		tg.ngay = -1;
+		tg.gio = -1;
+		tg.phut = -1;
+		char noiden[150];
+		strcpy(noiden,"");
+		
+		
 	while(true)
 	{
 		system("cls");
 		frame_NhapNgay_NoiDen(40,8);
-		int trang = 0, tongtrang = 0;
-		int ngay=-1, thang=-1, nam = -1;
-		char noiden[150];
-		strcpy(noiden,"");
-		
-		Node_CB *pNodeCB;
-		bool flag = false;
+	
 		int demfield = 0;
 		
 		// NAM
-		do
-		{
-			flag = false;
+		NhapNAM:
 			char nam_input[10];
 			gotoxy(51,9);
 			
 			string tmp = nhapSo(51,9);
 			
-			if (tmp == "exit") break;
+			if (tmp == "exit") return;
 			strcpy(nam_input, tmp.c_str());
 			strcpy(nam_input, fix_Ma(nam_input)); // chua xet TH rong, ko co ma CB
 	
 			if (strcmp(nam_input, "\0") == 0)
 			{
-				gotoxy(40,17); cout <<"Khong bo trong";
-				Sleep(1500);
-				gotoxy(40,17); cout <<"				1";
-				gotoxy(51,9); cout << "    ";
+				gotoxy(xThongBao,yThongBao); cout<<"Khong bo trong";
+				Sleep(1000);
+				gotoxy(xThongBao,yThongBao); cout<<"              ";
+				goto NhapNAM;
 			}
 			else 
 			{
-				int nam_info = atoi(nam_input);
-				if (nam_info < 2019)
+				int check = check_Chuoi_Char(nam_input);
+				if (check == 1)
 				{
-					gotoxy(35,15); cout <<"NAM >= 2019	";
+					int nam_info = atoi(nam_input);
+					if (nam_info < 2019)
+					{
+						gotoxy(xThongBao,yThongBao); cout <<"NAM >= 2019!";
+						Sleep(1500);
+						gotoxy(xThongBao,yThongBao); cout <<"            ";
+						gotoxy(51,9); cout << "    ";
+						goto NhapNAM;
+					}else
+					{
+						demfield++;
+						tg.nam = nam_info;
+						gotoxy(51, 9);  cout<<"    ";
+						gotoxy(51, 9);  cout<<tg.nam;
+						goto NhapTHANG;
+					}
+				}
+				else
+				{
+					gotoxy(xThongBao,yThongBao); cout <<"Khong duoc co chu!";
 					Sleep(1500);
-					gotoxy(35,15); cout <<"				";
+					gotoxy(xThongBao,yThongBao); cout <<"                  ";
 					gotoxy(51,9); cout << "    ";
-				}else
-				{
-					demfield++;
-					nam = nam_info;
-					gotoxy(51, 9);  cout<<"    ";
-					gotoxy(51, 9);  cout<<nam;
-					flag = true;
+					goto NhapNAM;
 				}
 				
+				
 			}
-		}while(flag == false);
-		if (nam == -1) break;
 		
 		// THANG
-		do
-		{
-			flag = false;
+		NhapTHANG:
 			char thang_input[10];
 			gotoxy(51,10);
+			tmp = "";
+			tmp = nhapSo(51,10);
 			
-			string tmp = nhapSo(51,10);
-			
-			if (tmp == "exit") break;
+			if (tmp == "exit") return;
 			strcpy(thang_input, tmp.c_str());
 			strcpy(thang_input, fix_Ma(thang_input)); // chua xet TH rong, ko co ma CB
 	
 			if (strcmp(thang_input, "\0") == 0)
 			{
-				gotoxy(35,28); cout <<"Khong bo trong";
+				gotoxy(xThongBao,yThongBao); cout <<"Khong bo trong";
 				Sleep(1500);
-				gotoxy(35,28); cout <<"					";
+				gotoxy(xThongBao,yThongBao); cout <<"              ";
 				gotoxy(51,10); cout <<"    ";
+				goto NhapTHANG;
 			}
 			else 
 			{
-				int thang_info = atoi(thang_input);
-				if (thang_info <= 0 || thang_info > 12)
+				int check = check_Chuoi_Char(thang_input);
+				if (check == 1)
 				{
-					gotoxy(35,28); cout <<"THANG KHONG HOP LE";
+					int thang_info = atoi(thang_input);
+					if (thang_info <= 0 || thang_info > 12)
+					{
+						gotoxy(xThongBao,yThongBao); cout <<"THANG KHONG HOP LE";
+						Sleep(1500);
+						gotoxy(xThongBao,yThongBao); cout <<"                  ";
+						gotoxy(51,10); cout <<"    ";
+						goto NhapTHANG;
+					}else
+					{
+						demfield++;
+						tg.thang = thang_info;
+						gotoxy(51, 10);   cout<<"    ";
+						gotoxy(51, 10);   cout<<tg.thang;
+						goto NhapNGAY;
+					}
+				}
+				else
+				{
+					gotoxy(xThongBao,yThongBao); cout <<"Khong duoc co chu!";
 					Sleep(1500);
-					gotoxy(35,28); cout <<"				     ";
+					gotoxy(xThongBao,yThongBao); cout <<"                  ";
 					gotoxy(51,10); cout <<"    ";
-				}else
-				{
-					demfield++;
-					thang = thang_info;
-					gotoxy(51, 10);  	cout<<"    ";
-					gotoxy(51, 10);   cout<<thang;
-					flag = true;
+					goto NhapTHANG;
 				}
 				
 			}
-		}while(flag == false);
-		if (thang == -1) break;
+		
 		
 		// NGAY
-		do
-		{
-			flag = false;
+		NhapNGAY:
 			char ngay_input[10];
 			gotoxy(51,11);
+			tmp = "";
+			tmp = nhapSo(51,11);
 			
-			string tmp = nhapSo(51,11);
-			
-			if (tmp == "exit") break;
+			if (tmp == "exit") return;
 			strcpy(ngay_input, tmp.c_str());
 			strcpy(ngay_input, fix_Ma(ngay_input)); // chua xet TH rong, ko co ma CB
 	
 			if (strcmp(ngay_input, "\0") == 0)
 			{
-				gotoxy(35,28); cout <<"Khong bo trong";
+				gotoxy(xThongBao,yThongBao); cout <<"Khong bo trong";
 				Sleep(1500);
-				gotoxy(35,28); cout <<"					";
+				gotoxy(xThongBao,yThongBao); cout <<"              ";
 				gotoxy(51,11); cout <<"    ";
+				goto NhapNGAY;
 			}
 			else 
 			{
-				int ngay_info = atoi(ngay_input);
-				if (ngay_info <= 0 || ngay_info > 31 || !Check_Date(nam,thang,ngay_info))
+				int check = check_Chuoi_Char(ngay_input);
+				if (check == 1)
 				{
-					gotoxy(35,28); cout <<"NGAY KHONG HOP LE";
-					Sleep(1500);
-					gotoxy(35,28); cout <<"				     ";
-					gotoxy(51,11); cout <<"    ";
-				}else
-				{
-					demfield++;
-					ngay = ngay_info;
-					gotoxy(51, 10);  	cout<<"    ";
-					gotoxy(51, 11);   cout<<ngay;
-					flag = true;
+					int ngay_info = atoi(ngay_input);
+					if (ngay_info <= 0 || ngay_info > 31 || !Check_Date(tg.nam,tg.thang,ngay_info))
+					{
+						gotoxy(xThongBao,yThongBao); cout <<"NGAY KHONG HOP LE";
+						Sleep(1500);
+						gotoxy(xThongBao,yThongBao); cout <<"                 ";
+						gotoxy(51,11); cout <<"    ";
+						goto NhapNGAY;
+					}else
+					{
+						demfield++;
+						tg.ngay = ngay_info;
+						gotoxy(51, 11);  	cout<<"    ";
+						gotoxy(51, 11);     cout<<tg.ngay;
+						goto NhapNOIDEN;
+					}
 				}
-				
+				else
+				{
+					gotoxy(xThongBao,yThongBao); cout <<"Khong duoc co chu!";
+					Sleep(1500);
+					gotoxy(xThongBao,yThongBao); cout <<"                  ";
+					gotoxy(51,11); cout <<"    ";
+					goto NhapNGAY;
+				}
 			}
-		}while(flag == false);
-		if (ngay == -1) break;
+		
 		
 		// NOI DEN
-		do{
-			flag = false;
+		NhapNOIDEN:
 			gotoxy(51,12);
-			string tmp = nhapChuoi(51,12);
-
+			tmp = "";
+			tmp = nhapChuoi(51,12);
 			if(tmp == "exit"){
-				break;
+				return;
 			}
 			strcpy(noiden, tmp.c_str()); 
 			strcpy(noiden, fix_HoTen(noiden));
 			
 			if (strcmp(noiden, "\0") == 0)
 			{
-				gotoxy(35,28); cout<<"KHONG BO TRONG!";
+				gotoxy(xThongBao,yThongBao); cout<<"KHONG BO TRONG!";
 				Sleep(1000);  
-				gotoxy(35,28); cout<<"                                 ";
-				gotoxy(51,12);  cout<<"                                 ";
+				gotoxy(xThongBao,yThongBao); cout<<"               ";
+				gotoxy(51,12); cout<<"                                 ";
+				goto NhapNOIDEN;
 			}
 			else if (Check_NoiDen(lcb, noiden) == -1)
 			{
-				gotoxy(35,28); cout<<"NOI NAY HIEN TAI CHUA CO CHUYEN NAO!";
+				gotoxy(xThongBao,yThongBao); cout<<"NOI NAY HIEN TAI CHUA CO CHUYEN NAO!";
 				Sleep(1000);  
-				gotoxy(35,28); cout<<"                                    ";
-				gotoxy(51,12);  cout<<"                                   ";
+				gotoxy(xThongBao,yThongBao); cout<<"                                    ";
+				gotoxy(51,12); cout<<"                                    ";
+				goto NhapNOIDEN;
 			}
 			else
 			{
 				demfield++;
 				gotoxy(51,12);  cout<<"                                 ";
-				gotoxy(51,12);cout<<noiden;
-				flag = true;
+				gotoxy(51,12); cout<<noiden;
 			}
-		}while(flag == false);
-		if (strcmp(noiden, "") == 0) break;
+		
 		
 		if (demfield == 4){
-			gotoxy(1,1); cout<<"du 4 filed";
-			system("pause");
-		}
-			
-		
+			break;
+		}			
+	}
+	
+	
+	int soluong = soLuong_CB_TG_ND(lcb,tg,noiden);
+	if (soluong <= 20)
+	{
+		trang = 0;
+		tongtrang = 1;
+	}
+	else
+	{
+		tongtrang = (soluong / 21) + 1;
 	}
 	
 	
 	
-	
-//		gotoxy(49,3); cout<<pNodeCB->cb.tgKhoiHanh.ngay;
-//		gotoxy(52,3); cout<<pNodeCB->cb.tgKhoiHanh.thang;
-//		gotoxy(55,3); cout<<pNodeCB->cb.tgKhoiHanh.nam;
-//		gotoxy(61,3); cout<<pNodeCB->cb.tgKhoiHanh.gio;
-//		gotoxy(64,3); cout<<pNodeCB->cb.tgKhoiHanh.phut;
-//		gotoxy(77,3); cout<<pNodeCB->cb.sanBayDen;
-//		
-//		if (pNodeCB->cb.dsVe.n <= 20)
-//		{
-//			trang = 0;
-//			tongtrang = 1;
-//		}
-//		else
-//		{
-//			tongtrang = (pNodeCB->cb.dsVe.n / 21) + 1;
-//		}
-//	}
-//	while(1)
-//	{
-//	Xuat:	
-//		SetColor(ColorWHITE); SetBGColor(ColorBLACK);
-//		system("cls");
-//		TableChuyenBay();
-//		HienThiTrang(tongtrang, trang, 20, 28);
-//		ButtonThem(ColorDARKWHITE);
-//		ButtonXoa(ColorDARKWHITE);
-//		ButtonSua(ColorDARKWHITE);
-//		ButtonESC(ColorDARKWHITE);
-//		ButtonHuyChuyen(ColorDARKWHITE);
-//		
-//		SetColor(ColorWHITE); SetBGColor(ColorBLACK);
-//		
-//		gotoxy(tabx + 4, taby + 3);
-//		int dem = 0;
-//		int item = 0 + trang * 20;
-//		int itemtoida = 20 + trang * 20;
-//		
-//		for (Node_CB *pNode = lcb.pHead; pNode != NULL; pNode=pNode->pNext)
-//		{
-//			if (item < itemtoida && item < soluong)
-//			{
-//				int ngay = pNode->cb.tgKhoiHanh.ngay;
-//				int thang = pNode->cb.tgKhoiHanh.thang;
-//				int nam = pNode->cb.tgKhoiHanh.nam;
-//				int gio = pNode->cb.tgKhoiHanh.gio;
-//				int phut = pNode->cb.tgKhoiHanh.phut;
-//				
-//				
-//				gotoxy(tabx + 4, taby + 3 + dem); cout <<dem+1;
-//				gotoxy(tabx + 12, taby + 3 + dem); cout<<pNode->cb.soHieuMB;
-//				gotoxy(tabx + 27, taby + 3 + dem); cout<<pNode->cb.maCB;
-//				gotoxy(tabx + 42, taby + 3 + dem); cout <<ngay<<"/"<<thang<<"/"<<nam;
-//				gotoxy(tabx + 60, taby + 3 + dem); cout<<gio<<":"<<phut;
-//				gotoxy(tabx + 73, taby + 3 + dem); cout <<pNode->cb.sanBayDen;
-//				gotoxy(tabx + 88, taby + 3 + dem); cout <<pNode->cb.trangThai;
-//				dem++;
-//				item++;
-//			}
-//		
-//		}
-//		
-//		gotoxy(40, 29);
-//		cout << "[<-] Tro lai | Tiep Theo [->]"; 
-//		
-//		int c = 0;
-//		do{
-//			c = getch();
-//		}while(c != LEFT && c != RIGHT && c!= ESC && c != F1 && c != F2 && c != F3 && c != F4);
-//		if (c == ESC)
-//		{
+	while(true)
+	{
+		Xuat:
+			system("cls");
+			TableChuyenBay();
+			gotoxy(66,2); cout<<"THEO NGAY "<<tg.ngay<<"/"<<tg.thang<<"/"<<tg.nam;
+			gotoxy(58,3); cout<<"NOI DEN: "<<noiden;
+			HienThiTrang(tongtrang, trang, 20, 28);
+			SetColor(ColorBLACK);
+			ButtonESC(ColorDARKWHITE);
+			SetColor(ColorWHITE); SetBGColor(ColorBLACK);
+			gotoxy(tabx + 4, taby + 3);
+			int dem = 0;
+			int item = 0 + trang * 20;
+			int itemtoida = 20 + trang * 20;
+			for(Node_CB *pNode = lcb.pHead ; pNode != NULL; pNode=pNode->pNext)
+			{
+				if (item < itemtoida && item < soluong)
+				{
+					if (Check_ThoiGian_NoiDen(pNode->cb, tg, noiden) == true)
+					{
+						int ngay = pNode->cb.tgKhoiHanh.ngay;
+						int thang = pNode->cb.tgKhoiHanh.thang;
+						int nam = pNode->cb.tgKhoiHanh.nam;
+						int gio = pNode->cb.tgKhoiHanh.gio;
+						int phut = pNode->cb.tgKhoiHanh.phut;
+						
+						
+						gotoxy(tabx + 4, taby + 3 + dem); cout <<dem+1;
+						gotoxy(tabx + 12, taby + 3 + dem); cout<<pNode->cb.soHieuMB;
+						gotoxy(tabx + 27, taby + 3 + dem); cout<<pNode->cb.maCB;
+						gotoxy(tabx + 42, taby + 3 + dem); cout <<ngay<<"/"<<thang<<"/"<<nam;
+						gotoxy(tabx + 60, taby + 3 + dem); cout<<gio<<":"<<phut;
+						gotoxy(tabx + 73, taby + 3 + dem); cout <<pNode->cb.sanBayDen;
+						gotoxy(tabx + 88, taby + 3 + dem); cout <<pNode->cb.trangThai;
+						dem++;
+						item++;
+					}
+				}
+			}
+		gotoxy(40, 29);
+		cout << "[<-] Tro lai | Tiep Theo [->]"; 
+		
+		int c = 0;
+		do{
+			c = getch();
+		}while(c != LEFT && c != RIGHT && c!= ESC);
+		if (c == ESC)
+		{
 //			ButtonESC(127);
-//			Sleep(500);
-//			int a = XacNhanSaveFile();
-//			if(a == 1)
-//			{
-//				LuuFileChuyenBay(lcb, lmb);
-//			}
-//			break;
-//		}
-//		else if (c == LEFT)
-//		{
-//			if(tongtrang > 1 && trang > 0)
-//			{
-//				trang--;
-//				goto Xuat;
-//			}
-//		}
-//		else if (c == RIGHT)
-//		{
-//			if(tongtrang > 1 && trang  + 1 < tongtrang)
-//			{
-//				trang++;
-//				goto Xuat;
-//			}
-//		}
-//		else if (c == F1)
-//		{
-//			Sleep(500);
-//			NhapChuyenBay(lmb, lcb);
-//			goto Xuat;
-//		}
-//		else if (c == F2)
-//		{
-//			Sleep(500);
-//			XoaChuyenBay(lcb);
-//			system("cls");
-//			goto Xuat;
-//		}
-//		else if (c == F3)
-//		{
-//			Sleep(500);
-//			SuaChuyenBay(lcb,lmb);
-//			system("cls");
-//			goto Xuat;
-//		}
-//	}	
+			Sleep(500);
+			break;
+		}
+		else if (c == LEFT)
+		{
+			if(tongtrang > 1 && trang > 0)
+			{
+				trang--;
+				goto Xuat;
+			}
+		}
+		else if (c == RIGHT)
+		{
+			if(tongtrang > 1 && trang  + 1 < tongtrang)
+			{
+				trang++;
+				goto Xuat;
+			}
+		}
+	}	
 }
 
 
@@ -4107,10 +4135,11 @@ void Danh_Sach_HK_Trong_CB(SingleList_CB lcb, ListMayBay lmb)
 	int trang = 0, tongtrang = 0;
 	char maCB[15];
 	strcpy(maCB, "");
-	Node_CB *pNodeCB;
+	Node_CB *pNodeCB = NULL;
 	bool flag = false;
 	while(flag == false)
 	{
+		NhapLai:
 		system("cls");
 		Box_DS_HK_Trong_CB();
 		gotoxy(80,2);
@@ -4125,14 +4154,14 @@ void Danh_Sach_HK_Trong_CB(SingleList_CB lcb, ListMayBay lmb)
 			gotoxy(35,28); cout <<"Khong bo trong";
 			Sleep(1500);
 			gotoxy(35,28); cout <<"					";
-			goto Xuat;
+			goto NhapLai;
 		}
 		int x = Check_MaCB(lcb, maCB);
 		if (x == -1){
 			gotoxy(35,28); cout <<"Ma Chuyen Bay khong ton tai!	";
 			Sleep(1500);
 			gotoxy(35,28); cout <<"								";
-			goto Xuat;
+			goto NhapLai;
 		}else if (x == 1){
 			pNodeCB = TimKiem_CB(lcb, maCB);
 			flag = true;
@@ -4206,7 +4235,7 @@ void Danh_Sach_HK_Trong_CB(SingleList_CB lcb, ListMayBay lmb)
 		do{
 			c = getch();
 		}while(c != LEFT && c != RIGHT && c != ESC);
-		 if (c == LEFT)
+		if (c == LEFT)
 		{
 			if(tongtrang > 1 && trang > 0)
 			{
@@ -4377,17 +4406,14 @@ void Danh_Sach_Ve_Trong_CB(SingleList_CB lcb, ListMayBay lmb)
 void Danh_Sach_Thong_Ke_So_Luot_Bay(SingleList_CB lcb, ListMayBay lmb)
 {
 	int trang = 0, tongtrang = 0;
-//	int soluongcb = CountCB(lcb);
 	if (lmb.soluong <= 20)
 	{
 		trang = 0;
 		tongtrang = 1;
-//		gotoxy(1,1); cout<<trang<< " trang";
 	}
 	else
 	{
 		tongtrang = (lmb.soluong / 21) + 1;
-//		gotoxy(1,2); cout<<tongtrang<<" tong trang";
 	}
 	string sh[lmb.soluong]; // mang chua so Hieu
 	int soluot[lmb.soluong]; // mang chua so luot
@@ -4403,9 +4429,9 @@ void Danh_Sach_Thong_Ke_So_Luot_Bay(SingleList_CB lcb, ListMayBay lmb)
 		index++;
 	}
 	
-	for (int i = 0; i < lmb.soluong; i++){
-		for (int j = lmb.soluong - 1; j >= i; j--){
-			if (soluot[j-1] > soluot[j]){
+	for (int i = 0; i < lmb.soluong-1; i++){
+		for (int j = lmb.soluong - 1; j > i; j--){
+			if (soluot[j-1] < soluot[j]){
 				int m = soluot[j-1];
 				string n = sh[j-1];
 				
@@ -4417,6 +4443,14 @@ void Danh_Sach_Thong_Ke_So_Luot_Bay(SingleList_CB lcb, ListMayBay lmb)
 			}
 		}
 	}
+	
+	for(int i = 0; i < lmb.soluong; i++)
+	{
+		cout<<sh[i]<<"-"<<soluot[i]<<endl;
+	}
+	system("pause");
+	
+	
 	while(1)
 	{
 		Xuat:
@@ -4684,7 +4718,7 @@ void Dat_Ve(ListMayBay lmb, SingleList_CB &lcb, NODPTR &tree)
 									if (cb.trangThai == 3){
 										gotoxy(xThongBao, yThongBao); cout << "Chuyen bay da cat canh!!";
 										Sleep(1500);
-										gotoxy(xThongBao, yThongBao); cout << "						   ";
+										gotoxy(xThongBao, yThongBao); cout << "                        ";
 										gotoxy(17, 5); cout<<"                    ";
 										strcpy(macb,"");
 										goto NhapMaCB;
@@ -4909,12 +4943,14 @@ void HuyVe(SingleList_CB &lcb, ListMayBay lmb){
 		int xThongBao = 54, yThongBao = 19;
 	NhapMaCB:
 		do{
+			gotoxy(17,5); cout<<"    ";
 			gotoxy(17,5);
 			temp = nhapChuoi(17,5);
 			if (temp == "exit")
 				goto THOAT;
 			strcpy(macb, temp.c_str());
 			strcpy(macb, fix_Ma(macb));
+			SetBGColor(ColorBLACK);
 			if (Check_MaCB(lcb, macb) == true)
 			{
 				if (lmb.soluong > 0)
@@ -4929,7 +4965,7 @@ void HuyVe(SingleList_CB &lcb, ListMayBay lmb){
 							if (cb.trangThai == 3){
 								gotoxy(xThongBao, yThongBao); cout << "Chuyen bay da cat canh khong huy ve duoc!!";
 								Sleep(1500);
-								gotoxy(xThongBao, yThongBao); cout << "                                                       ";
+								gotoxy(xThongBao, yThongBao); cout << "                                           ";
 								gotoxy(41, 5); cout<<"                    ";
 								strcpy(macb,"");
 								goto NhapMaCB;
@@ -4937,7 +4973,7 @@ void HuyVe(SingleList_CB &lcb, ListMayBay lmb){
 							else if (cb.trangThai == 0){
 								gotoxy(xThongBao, yThongBao); cout << "Chuyen bay da huy!!";
 								Sleep(1500);
-								gotoxy(xThongBao, yThongBao); cout << "                                                  ";
+								gotoxy(xThongBao, yThongBao); cout << "                    ";
 								gotoxy(41, 5); cout<<"                    ";
 								strcpy(macb,"");
 								goto NhapMaCB;
@@ -5084,20 +5120,14 @@ void Menu(ListMayBay &lmb, SingleList_CB &lcb)
 							   " 11. KET THUC CHUONG TRINH                                        "};
 	Menu:
 		
-//		gotoxy(10,1);cout <<"   _____ _             _            _   ";
-//		gotoxy(10,2);cout <<"  / ____| |           | |          | |  ";
-//		gotoxy(10,3);cout <<" | (___ | |_ _   _  __| | ___ _ __ | |_ ";
-//		gotoxy(10,4);cout <<"  \\___ \\| __| | | |/ _` |/ _ \\ '_ \\| __|";
-//		gotoxy(10,5);cout <<"  ____) | |_| |_| | (_| |  __/ | | | |_ ";
-//		gotoxy(10,6);cout <<" |_____/ \\__|\\__,_|\\__,_|\\___|_| |_|\\__|";
 		SetColor(ColorWHITE); SetBGColor(ColorBLACK);
 		system("cls");
-		gotoxy(10,1);cout <<"     __      _         _____      _     _            _   ";
-		gotoxy(10,2);cout <<"    /  \\    |_|       |___| |	 | |   | |          | |  ";
-		gotoxy(10,3);cout <<"   / __ \\    _  ___   |____/  	| |  __| | ___ _ __ | |_ ";
-		gotoxy(10,4);cout <<"  / |__| \\  | ||  _|  |      		| |   | | |/ _` |/ _ \\ '_ \\| __|";
-		gotoxy(10,5);cout <<" /   ___  \\ | |||\\ \\  |  |    | | | (_| |  __/ | | | |_ ";
-		gotoxy(10,6);cout <<"/___/   \\__\\|_||| \\_\\ |__|      |_||_ \\  ,_|\\__,_|\\___|_| |_|\\__|";
+		gotoxy(10,1);cout <<"     __      _         _____  _                        ";
+		gotoxy(10,2);cout <<"    /  \\    |_|       |  _  || |                     ";
+		gotoxy(10,3);cout <<"   / __ \\    _  ___   | |_| || | __ _ _ __   ___          ";
+		gotoxy(10,4);cout <<"  / |__| \\  | || __|  |  __ /| |/ _` | '_ \\ / _ \\         ";
+		gotoxy(10,5);cout <<" /   ___  \\ | |||\\ \\  | |    | | (_| | | | |  __/         ";
+		gotoxy(10,6);cout <<"/___/   \\__\\|_||| \\_\\ |_|    |_|\\__,_|_| |_|\\___|                  ";
 	
 		gotoxy(30,7); cout <<"  __  __                                                   _   ";
 		gotoxy(30,8); cout <<" |  \\/  |                                                 | |  ";
@@ -5124,7 +5154,7 @@ void Menu(ListMayBay &lmb, SingleList_CB &lcb)
 	}
 	SetBGColor(ColorBLUE);
 	gotoxy(x, 16); cout << menu_text[0];
-
+	
 	do{
 
 		keyhit = getch();
@@ -5209,7 +5239,7 @@ void Menu(ListMayBay &lmb, SingleList_CB &lcb)
 						SetBGColor(0);
 						SetColor(15);
 						system("cls");
-						
+						Danh_Sach_ChuyenBay_Trong_Ngay(lcb, lmb);
 						goto Menu;
 					}
 					case 8:
@@ -5263,7 +5293,7 @@ int main(int argc, char** argv) {
 //	Danh_Sach_ChuyenBay_Trong_Ngay(lcb,lmb);
 //Box_DS_CB_Khoi_Ngay_Theo_Ngay();
 
-
+//TableChuyenBay();
 	Menu(lmb, lcb);
 //	Box_SuaMayBay();
 ////	Box_DS_HK_Trong_CB();
