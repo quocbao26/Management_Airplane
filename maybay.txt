@@ -1,4 +1,4 @@
-23
+19
 VN-001,AirLine 1,30
 VN-006,AirLine 2,31
 VN-007,AirLine 3,32
@@ -17,8 +17,4 @@ VN-019,AirLine 15,44
 VN-020,AirLine 16,45
 VN-021,AirLine 17,46
 VN-022,AirLine 18,47
-VN-023,AirLine 19,3
 VN-024,Air Line 24,30
-VN-999,Korean,3
-BAO,Bao,20
-KIENLOI	,Vnail,4
